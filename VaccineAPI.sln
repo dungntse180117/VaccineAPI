@@ -5,6 +5,10 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineAPI", "VaccineAPI\VaccineAPI.csproj", "{CF94079E-C280-48F6-9E98-2ED0A7AA66A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineAPI.BusinessLogic", "VaccineAPI.BusinessLogic\VaccineAPI.BusinessLogic.csproj", "{6BD261AC-1019-4DAF-ACC2-60DE7D7E0117}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineAPI.DataAccess", "VaccineAPI.DataAccess\VaccineAPI.DataAccess.csproj", "{F3BE0E45-757F-45B9-93B0-8FEE23AC05B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{CF94079E-C280-48F6-9E98-2ED0A7AA66A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF94079E-C280-48F6-9E98-2ED0A7AA66A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF94079E-C280-48F6-9E98-2ED0A7AA66A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BD261AC-1019-4DAF-ACC2-60DE7D7E0117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BD261AC-1019-4DAF-ACC2-60DE7D7E0117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BD261AC-1019-4DAF-ACC2-60DE7D7E0117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BD261AC-1019-4DAF-ACC2-60DE7D7E0117}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3BE0E45-757F-45B9-93B0-8FEE23AC05B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3BE0E45-757F-45B9-93B0-8FEE23AC05B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3BE0E45-757F-45B9-93B0-8FEE23AC05B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3BE0E45-757F-45B9-93B0-8FEE23AC05B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
