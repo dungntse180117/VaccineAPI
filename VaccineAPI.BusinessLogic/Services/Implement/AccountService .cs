@@ -95,36 +95,6 @@ namespace VaccineAPI.Services
             return newAccount;
         }
 
-        public async Task<Account> CreateAccount(CreateAccountByAdmin model)
-        {
-            _logger.LogInformation($"Registering new account for email: {model.Email}");
-
-            if (await _dbContext.Accounts.AnyAsync(a => a.Email == model.Email))
-            {
-                _logger.LogError($"Registration failed: Email already registered: {model.Email}");
-                throw new ArgumentException("Email already registered.");
-            }
-
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
-
-            var newAccount = new Account
-            {
-                Name = model.Name,
-                Email = model.Email,
-                Password = hashedPassword,
-                RoleId = model.RoleId,
-                Phone = model.Phone,
-                Address = model.Address,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _dbContext.Accounts.Add(newAccount);
-            await _dbContext.SaveChangesAsync();
-
-            _logger.LogInformation($"Account registered successfully for email: {model.Email}");
-            return newAccount;
-        }
         public async Task UpdateAsync(int id, UpdateRequest model)
         {
             _logger.LogInformation($"Updating account with ID: {id}");
