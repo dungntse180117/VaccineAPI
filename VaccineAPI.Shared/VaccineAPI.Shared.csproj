@@ -7,12 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\VaccineAPI.DataAccess\VaccineAPI.DataAccess.csproj" />
-    <ProjectReference Include="..\VaccineAPI.Shared\VaccineAPI.Shared.csproj" />
   </ItemGroup>
 
 </Project>
