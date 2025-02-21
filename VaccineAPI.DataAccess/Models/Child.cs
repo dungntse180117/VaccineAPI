@@ -7,7 +7,7 @@ public partial class Child
 {
     public int ChildId { get; set; }
 
-    public DateOnly Dob { get; set; }
+    public DateTime Dob { get; set; }
 
     public string? ChildName { get; set; }
 

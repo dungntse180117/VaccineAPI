@@ -11,13 +11,19 @@ public partial class Account
 
     public int RoleId { get; set; }
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
 
-    public string Phone { get; set; } = null!;
+    public string? Password { get; set; }
+
+    public string? Phone { get; set; }
 
     public string? Address { get; set; }
 
     public int? ChildId { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     public virtual Child? Child { get; set; }
 

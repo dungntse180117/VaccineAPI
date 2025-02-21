@@ -19,6 +19,8 @@ public partial class VaccinationAppointment
 
     public virtual Child? Child { get; set; }
 
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual ICollection<VaccinationService> VaccinationServices { get; set; } = new List<VaccinationService>();

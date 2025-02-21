@@ -1,7 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using VaccineAPI.DataAccess.Data;
+using VaccineAPI.DataAccess.Models;
+
 var builder = WebApplication.CreateBuilder(args);
-
+// Configure DbContext
+builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
-
+builder.Services.AddScoped<IChildService, ChildService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
