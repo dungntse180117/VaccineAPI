@@ -71,15 +71,19 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Add services
-builder.Services.AddScoped<IJwtUtils, JwtUtils>(); 
+builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Logging configuration
+builder.Logging.ClearProviders();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -91,9 +95,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); 
-app.UseMiddleware<JwtMiddleware>(); 
+// **Use CORS**
+app.UseCors(x => x
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<JwtMiddleware>();
+app.UseMiddleware<TrafficLoggingMiddleware>();
 
 app.MapControllers();
 
