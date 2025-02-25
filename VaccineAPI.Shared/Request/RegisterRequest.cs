@@ -18,7 +18,7 @@ namespace VaccineAPI.Shared.Request
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; } = null!;
-
+       
         public string? Phone { get; set; }
         public string? Address { get; set; }
     }
