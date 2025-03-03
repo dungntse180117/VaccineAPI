@@ -13,6 +13,7 @@ namespace VaccineAPI.Shared.Response
         public string? Name { get; set; }
         public string? Email { get; set; }
         public string Token { get; set; }
+        public int ? RoleId { get; set; }
 
 
         public AuthenticateResponse(Account account, string token)
@@ -20,6 +21,7 @@ namespace VaccineAPI.Shared.Response
             Id = account.AccountId;
             Name = account.Name;
             Email = account.Email;
+            RoleId = account.RoleId;
             Token = token;
         }
     }

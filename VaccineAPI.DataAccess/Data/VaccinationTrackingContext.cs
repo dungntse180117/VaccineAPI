@@ -124,6 +124,26 @@ public partial class VaccinationTrackingContext : DbContext
                 .HasConstraintName("FK__Banner__accountI__534D60F1");
         });
 
+        modelBuilder.Entity<Banner>(entity =>
+        {
+            entity.HasKey(e => e.BannerId).HasName("PK__Banner__BD58D473926C7F6C");
+
+            entity.ToTable("Banner");
+
+            entity.Property(e => e.BannerId).HasColumnName("bannerId");
+            entity.Property(e => e.AccountId).HasColumnName("accountId");
+            entity.Property(e => e.BannerImage)
+                .HasMaxLength(255)
+                .HasColumnName("bannerImage");
+            entity.Property(e => e.BannerName)
+                .HasMaxLength(255)
+                .HasColumnName("bannerName");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.Banners)
+                .HasForeignKey(d => d.AccountId)
+                .HasConstraintName("FK__Banner__accountI__534D60F1");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.CategoryId).HasName("PK__Category__23CAF1D8713B6BF7");
