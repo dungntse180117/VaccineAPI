@@ -11,7 +11,7 @@ namespace VaccineAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "1")]
+    [Authorize] 
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -98,31 +98,6 @@ namespace VaccineAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error deleting account with id: {id}");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-        
-        [HttpPost("CreateAccount")]
-        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountByAdmin model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var newAccount = await _accountService.CreateAccount(model);
-                return Ok(newAccount); // Or return CreatedAtAction
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception here (important for debugging)
-                _logger.LogError(ex, $"Error registering user: {model.Email}");
                 return StatusCode(500, "Internal server error");
             }
         }
