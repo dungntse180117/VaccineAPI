@@ -1,4 +1,4 @@
-﻿    using System.Security.Claims;
+﻿using System.Security.Claims;
 using VaccineAPI.DataAccess.Data;
 using VaccineAPI.DataAccess.Models;
 namespace VaccineAPI.Authorization
