@@ -16,7 +16,9 @@ using VaccineAPI.BusinessLogic.Services.Interface;
 using VaccineAPI.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Configure DbContext
+builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -74,6 +76,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
+builder.Services.AddScoped<IChildService, ChildService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
