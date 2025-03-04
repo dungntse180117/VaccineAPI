@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using VaccineAPI.DataAccess.Models;
 
 namespace VaccineAPI.DataAccess.Data;
@@ -19,6 +18,8 @@ public partial class VaccinationTrackingContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
+    public virtual DbSet<Banner> Banners { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Child> Children { get; set; }
@@ -33,6 +34,8 @@ public partial class VaccinationTrackingContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<TrafficLog> TrafficLogs { get; set; }
+
     public virtual DbSet<Vaccination> Vaccinations { get; set; }
 
     public virtual DbSet<VaccinationAppointment> VaccinationAppointments { get; set; }
@@ -41,18 +44,9 @@ public partial class VaccinationTrackingContext : DbContext
 
     public virtual DbSet<VaccinationService> VaccinationServices { get; set; }
 
-    public static string GetConnectionString(string connectionStringName)
-    {
-        var config = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json")
-            .Build();
-
-        string connectionString = config.GetConnectionString(connectionStringName);
-        return connectionString;
-    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(GetConnectionString("DefaultConnection"));
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=LAPTOP-1ULHS1KH;Database=VaccinationTracking;User Id=sa;Password=12345;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -97,6 +91,23 @@ public partial class VaccinationTrackingContext : DbContext
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Account__roleId__3C69FB99");
+        });
+
+        modelBuilder.Entity<Banner>(entity =>
+        {
+            entity.HasKey(e => e.BannerId).HasName("PK__Banner__BD58D473DB93F412");
+
+            entity.ToTable("Banner");
+
+            entity.Property(e => e.BannerId).HasColumnName("bannerId");
+            entity.Property(e => e.AccountId).HasColumnName("accountId");
+            entity.Property(e => e.BannerName)
+                .HasMaxLength(255)
+                .HasColumnName("bannerName");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.Banners)
+                .HasForeignKey(d => d.AccountId)
+                .HasConstraintName("FK__Banner__accountI__5CD6CB2B");
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -221,6 +232,17 @@ public partial class VaccinationTrackingContext : DbContext
             entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
                 .HasColumnName("roleName");
+        });
+
+        modelBuilder.Entity<TrafficLog>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TrafficL__3214EC079145C7A1");
+
+            entity.Property(e => e.IpAddress).HasMaxLength(50);
+            entity.Property(e => e.RequestMethod).HasMaxLength(10);
+            entity.Property(e => e.RequestPath).HasMaxLength(255);
+            entity.Property(e => e.Timestamp).HasColumnType("datetime");
+            entity.Property(e => e.UserAgent).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Vaccination>(entity =>

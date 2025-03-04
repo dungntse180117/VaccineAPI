@@ -25,6 +25,8 @@ public partial class Account
 
     public DateTime? UpdatedAt { get; set; }
 
+    public virtual ICollection<Banner> Banners { get; set; } = new List<Banner>();
+
     public virtual Child? Child { get; set; }
 
     public virtual Role Role { get; set; } = null!;
