@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-<<<<<<< HEAD
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
@@ -16,6 +15,4 @@
     <ProjectReference Include="..\VaccineAPI.Shared\VaccineAPI.Shared.csproj" />
   </ItemGroup>
 
-=======
->>>>>>> parent of e915893 (Child (date not fix))
 </Project>

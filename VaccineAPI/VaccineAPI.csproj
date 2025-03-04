@@ -11,14 +11,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
-<<<<<<< HEAD
   <ItemGroup>
     <ProjectReference Include="..\VaccineAPI.BusinessLogic\VaccineAPI.BusinessLogic.csproj" />
     <ProjectReference Include="..\VaccineAPI.DataAccess\VaccineAPI.DataAccess.csproj" />
     <ProjectReference Include="..\VaccineAPI.Shared\VaccineAPI.Shared.csproj" />
   </ItemGroup>
 
-=======
->>>>>>> parent of e915893 (Child (date not fix))
 </Project>
     
