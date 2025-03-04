@@ -20,7 +20,7 @@ namespace VaccineAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateVaccine([FromBody] VaccinationRequest request)
+        public async Task<IActionResult> CreateVaccine([FromBody] VaccineRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -54,7 +54,7 @@ namespace VaccineAPI.Controllers
         }
 
         [HttpPut("{vaccinationId}")]
-        public async Task<IActionResult> UpdateVaccine(int vaccinationId, [FromBody] VaccinationRequest request)
+        public async Task<IActionResult> UpdateVaccine(int vaccinationId, [FromBody] VaccineRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -96,7 +96,7 @@ namespace VaccineAPI.Controllers
         }
 
         [HttpPost("manage/{vaccinationId}/{action}")]
-        public async Task<IActionResult> ManageVaccine(int vaccinationId, string action, [FromBody] VaccinationRequest? updateRequest = null)  //Made updateRequest Nullable
+        public async Task<IActionResult> ManageVaccine(int vaccinationId, string action, [FromBody] VaccineRequest? updateRequest = null)  //Made updateRequest Nullable
         {
             if (string.IsNullOrEmpty(action))
             {
