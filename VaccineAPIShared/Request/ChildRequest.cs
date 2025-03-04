@@ -20,4 +20,5 @@ public class ChildRequest
 
     [MaxLength(255, ErrorMessage = "Trạng thái tiêm chủng không được vượt quá 255 ký tự.")]
     public string VaccinationStatus { get; set; }
+    //help
 }
