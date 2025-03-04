@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VaccineAPI.Shared.Request
 {
-    public interface UpdateRequest
+    public class UpdateRequest
     {
         public string? Name { get; set; }
 
