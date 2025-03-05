@@ -15,7 +15,7 @@ public partial class Payment
 
     public string? Status { get; set; }
 
-    public virtual VaccinationAppointment Appointment { get; set; } = null!;
+    public string? PaymentMethod { get; set; }
 
-    public virtual ICollection<PaymentDetail> PaymentDetails { get; set; } = new List<PaymentDetail>();
+    public virtual VaccinationAppointment Appointment { get; set; } = null!;
 }

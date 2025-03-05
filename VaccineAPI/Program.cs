@@ -17,17 +17,18 @@ using VaccineAPI.Authorization;
 using VaccineAPI.BusinessLogic.Implement;
 using VaccineAPI.BusinessLogic.Interface;
 using VaccineAPI.DataAccess.Models;
-using IVaccineOrderService = VaccineAPI.BusinessLogic.Implement.IVaccineOrderService;
+//using IVaccineOrderService = VaccineAPI.BusinessLogic.Implement.IVaccineOrderService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
-builder.Services.AddScoped<IChildService, ChildService>();
-builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+//builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
+//builder.Services.AddScoped<IChildService, ChildService>();
+//builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -83,6 +84,11 @@ builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

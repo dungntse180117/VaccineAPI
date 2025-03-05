@@ -20,4 +20,6 @@ public partial class TrafficLog
     public bool IsRegistered { get; set; }
 
     public int? AccountId { get; set; }
+
+    public virtual Account? Account { get; set; }
 }
