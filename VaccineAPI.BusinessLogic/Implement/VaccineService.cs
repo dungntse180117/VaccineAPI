@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VaccineAPI.BusinessLogic.Interface;
+using VaccineAPI.DataAccess.Data;
 using VaccineAPI.DataAccess.Models;
 using VaccineAPI.Shared.Request;
 using VaccineAPI.Shared.Response;
@@ -12,9 +13,9 @@ namespace VaccineAPI.BusinessLogic.Implement
         private readonly DbContext _context;
         private readonly ILogger<VaccineService> _logger;
 
-        public VaccineService(DbContext context, ILogger<VaccineService> logger)
+        public VaccineService(VaccinationTrackingContext context, ILogger<VaccineService> logger)
         {
-            _context = context;
+            _context = context;  // Use VaccinationTrackingContext directly
             _logger = logger;
         }
 

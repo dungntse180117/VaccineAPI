@@ -24,9 +24,9 @@ namespace VaccineAPI.BusinessLogic.Implement
         private readonly string _connectionString; // Inject connection string
         private readonly ILogger<VaccineOrderService> _logger;
 
-        public VaccineOrderService(IConfiguration configuration, ILogger<VaccineOrderService> logger) // Inject IConfiguration
+        public VaccineOrderService(IConfiguration configuration, ILogger<VaccineOrderService> logger)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection"); // Get from appsettings.json or environment variables.  Name will be different.
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
             _logger = logger;
         }
 

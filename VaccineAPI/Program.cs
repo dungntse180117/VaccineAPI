@@ -1,17 +1,32 @@
 using Microsoft.EntityFrameworkCore;
+using VaccineAPI.BusinessLogic.Implement;
+using VaccineAPI.BusinessLogic.Interface;
 using VaccineAPI.DataAccess.Data;
 using VaccineAPI.DataAccess.Models;
+using VaccineAPI.Shared.Helpers;
+using IVaccineOrderService = VaccineAPI.BusinessLogic.Implement.IVaccineOrderService;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-// Add services to the container.
+
+// Register services
+builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
+
+// Register other necessary services
 builder.Services.AddScoped<IChildService, ChildService>();
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+
+// Configure logging
+builder.Services.AddLogging();
 
 var app = builder.Build();
 
@@ -23,9 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

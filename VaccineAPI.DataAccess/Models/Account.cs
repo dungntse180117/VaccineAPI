@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace VaccineAPI.DataAccess.Models;
 
 public partial class Account
 {
+    private string cloudName;
+    private string apiKey;
+    private string apiSecret;
+
+    public string account {  get; set; }
+
     public int AccountId { get; set; }
 
     public string Name { get; set; } = null!;

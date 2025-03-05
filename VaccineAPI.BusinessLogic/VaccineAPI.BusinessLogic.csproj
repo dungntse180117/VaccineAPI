@@ -7,8 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.27.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\VaccineAPI.DataAccess\VaccineAPI.DataAccess.csproj" />
     <ProjectReference Include="..\VaccineAPIShared\VaccineAPI.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModel\" />
   </ItemGroup>
 
 </Project>
