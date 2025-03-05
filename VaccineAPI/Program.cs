@@ -14,12 +14,20 @@ using VaccineAPI.Shared.Helpers;
 using VaccineAPI.BusinessLogic.Services.Implement;
 using VaccineAPI.BusinessLogic.Services.Interface;
 using VaccineAPI.Authorization;
+using VaccineAPI.BusinessLogic.Implement;
+using VaccineAPI.BusinessLogic.Interface;
+using VaccineAPI.DataAccess.Models;
+using IVaccineOrderService = VaccineAPI.BusinessLogic.Implement.IVaccineOrderService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-
+builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
+builder.Services.AddScoped<IChildService, ChildService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -84,6 +92,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
