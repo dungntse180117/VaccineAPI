@@ -1,5 +1,7 @@
 ﻿// Services/IChildService.cs
 using System.Collections.Generic;
+using VaccineAPI.Shared.Request;
+using VaccineAPI.Shared.Response;
 
 namespace VaccineAPI.DataAccess.Models;
 

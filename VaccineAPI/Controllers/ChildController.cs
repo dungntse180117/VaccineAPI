@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using VaccineAPI.DataAccess.Models;
+using VaccineAPI.Shared.Request;
+using VaccineAPI.Shared.Response;
 namespace VaccineAPI.Controllers
 {
     [ApiController]

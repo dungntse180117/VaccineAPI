@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using VaccineAPI.DataAccess.Data;  // Namespace của DbContext
 using Microsoft.EntityFrameworkCore;
+using VaccineAPI.Shared.Response;
+using VaccineAPI.Shared.Request;
 
 namespace VaccineAPI.DataAccess.Models;
 
