@@ -130,7 +130,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi GetAllPatientsAsync"); // Ghi log
+                _logger.LogError(ex, "Lỗi khi GetAllPatientsAsync"); 
                 throw;
             }
         }
@@ -172,7 +172,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     return null;
                 }
 
-                // Cập nhật các trường (thủ công)
+               
                 if (request.Dob.HasValue)
                 {
                     patient.Dob = request.Dob.Value;
@@ -204,7 +204,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
 
                 await _context.SaveChangesAsync();
 
-                // Tạo PatientResponse (ánh xạ thủ công)
+               
                 return new PatientResponse
                 {
                     PatientId = patient.PatientId,
@@ -219,7 +219,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi UpdatePatientAsync with ID: {id}.", id); // Ghi log
+                _logger.LogError(ex, "Lỗi khi UpdatePatientAsync with ID: {id}.", id); 
                 throw;
             }
         }
@@ -235,7 +235,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     return false;
                 }
 
-                // Xóa các bản ghi liên quan trong bảng ParentChild
+               
                 var parentChildren = await _context.ParentChildren
                     .Where(pc => pc.PatientId == id)
                     .ToListAsync();
@@ -243,7 +243,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 _context.ParentChildren.RemoveRange(parentChildren);
                 await _context.SaveChangesAsync();
 
-                // Xóa Patient
+               
                 _context.Patients.Remove(patient);
                 await _context.SaveChangesAsync();
 
@@ -251,7 +251,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi DeletePatientAsync with ID: {id}.", id); // Ghi log
+                _logger.LogError(ex, "Lỗi khi DeletePatientAsync with ID: {id}.", id); 
                 throw;
             }
         }

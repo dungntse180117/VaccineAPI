@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace VaccineAPI.Shared.Request
 {
-    public class OrderVaccineRequest
+    public class UpdateDiseaseRequest
     {
-        public int VaccinationId { get; set; }
-        public int Quantity { get; set; }
+        public string DiseaseName { get; set; }
+        public string Description { get; set; }
     }
 }

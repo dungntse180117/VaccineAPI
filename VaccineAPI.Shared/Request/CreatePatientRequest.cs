@@ -22,7 +22,7 @@
 
             public string? Address { get; set; }
 
-            public string? RelationshipToAccount { get; set; }
+            public string? RelationshipToAccount { get; set; }  
 
             public string? Phone { get; set; }
 
