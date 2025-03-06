@@ -11,25 +11,31 @@ public partial class Vaccination
 
     public string? Manufacturer { get; set; }
 
-    public string? Dose { get; set; }
+    public int? TotalDoses { get; set; }
+
+    public int? Interval { get; set; }
 
     public decimal? Price { get; set; }
 
     public string? Description { get; set; }
 
-    public int Quantity { get; set; }
-
-    public string? Img { get; set; }
-
     public int? MinAge { get; set; }
 
     public int? MaxAge { get; set; }
 
-    public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
+    public int? AgeUnitId { get; set; }
 
-    public virtual ICollection<VaccinationSchedule> VaccinationSchedules { get; set; } = new List<VaccinationSchedule>();
+    public int? UnitId { get; set; }
+
+    public virtual AgeUnit? AgeUnit { get; set; }
+
+    public virtual IntervalUnit? Unit { get; set; }
+
+    public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
 
     public virtual ICollection<VaccinationService> VaccinationServices { get; set; } = new List<VaccinationService>();
 
     public virtual ICollection<Disease> Diseases { get; set; } = new List<Disease>();
+
+    public virtual ICollection<Image> Imgs { get; set; } = new List<Image>();
 }

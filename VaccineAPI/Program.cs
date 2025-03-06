@@ -18,7 +18,8 @@ using VaccineAPI.BusinessLogic.Implement;
 using VaccineAPI.BusinessLogic.Interface;
 using VaccineAPI.DataAccess.Models;
 using VaccineAPI.BusinessLogic.Services;
-//using IVaccineOrderService = VaccineAPI.BusinessLogic.Implement.IVaccineOrderService;
+using VaccinationService = VaccineAPI.BusinessLogic.Services.Implement.VaccinationService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDiseaseService, DiseaseService>();
+builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
