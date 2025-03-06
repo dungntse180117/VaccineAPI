@@ -51,7 +51,11 @@ public partial class VaccinationTrackingContext : DbContext
 
     public virtual DbSet<VaccinationAppointment> VaccinationAppointments { get; set; }
 
+    public virtual DbSet<VaccinationDisease> VaccinationDiseases { get; set; }
+
     public virtual DbSet<VaccinationHistory> VaccinationHistories { get; set; }
+
+    public virtual DbSet<VaccinationImage> VaccinationImages { get; set; }
 
     public virtual DbSet<VaccinationService> VaccinationServices { get; set; }
 
@@ -68,13 +72,11 @@ public partial class VaccinationTrackingContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer(GetConnectionString("DefaultConnection"));
 
-
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267251E4556D029");
+            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267251EEABE927E");
 
             entity.ToTable("Account");
 
@@ -112,13 +114,11 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<AgeUnit>(entity =>
         {
-            entity.HasKey(e => e.AgeUnitId).HasName("PK__AgeUnit__ABBA3B182D10E44F");
+            entity.HasKey(e => e.AgeUnitId).HasName("PK__AgeUnit__ABBA3B180F1F9AAC");
 
             entity.ToTable("AgeUnit");
 
-            entity.Property(e => e.AgeUnitId)
-                .ValueGeneratedNever()
-                .HasColumnName("ageUnitId");
+            entity.Property(e => e.AgeUnitId).HasColumnName("ageUnitId");
             entity.Property(e => e.AgeUnitName)
                 .HasMaxLength(10)
                 .HasColumnName("ageUnitName");
@@ -126,7 +126,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<AppointmentService>(entity =>
         {
-            entity.HasKey(e => e.AppointmentServiceId).HasName("PK__Appointm__317F8CDB90C6880C");
+            entity.HasKey(e => e.AppointmentServiceId).HasName("PK__Appointm__317F8CDB01869D7C");
 
             entity.ToTable("Appointment_Service");
 
@@ -137,17 +137,17 @@ public partial class VaccinationTrackingContext : DbContext
             entity.HasOne(d => d.Appointment).WithMany(p => p.AppointmentServices)
                 .HasForeignKey(d => d.AppointmentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Appointme__appoi__797309D9");
+                .HasConstraintName("FK__Appointme__appoi__7A672E12");
 
             entity.HasOne(d => d.Service).WithMany(p => p.AppointmentServices)
                 .HasForeignKey(d => d.ServiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Appointme__servi__7A672E12");
+                .HasConstraintName("FK__Appointme__servi__7B5B524B");
         });
 
         modelBuilder.Entity<Banner>(entity =>
         {
-            entity.HasKey(e => e.BannerId).HasName("PK__Banner__BD58D473FFDDABE2");
+            entity.HasKey(e => e.BannerId).HasName("PK__Banner__BD58D4730C52A074");
 
             entity.ToTable("Banner");
 
@@ -159,12 +159,12 @@ public partial class VaccinationTrackingContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Banners)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Banner__accountI__09A971A2");
+                .HasConstraintName("FK__Banner__accountI__0A9D95DB");
         });
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Category__23CAF1D8692B0687");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Category__23CAF1D83134721E");
 
             entity.ToTable("Category");
 
@@ -176,7 +176,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<Configuration>(entity =>
         {
-            entity.HasKey(e => e.ConfigId).HasName("PK__Configur__3FEDA8E6DB72C6C7");
+            entity.HasKey(e => e.ConfigId).HasName("PK__Configur__3FEDA8E676494F88");
 
             entity.ToTable("Configuration");
 
@@ -194,7 +194,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<Disease>(entity =>
         {
-            entity.HasKey(e => e.DiseaseId).HasName("PK__Disease__49A195571DA2B259");
+            entity.HasKey(e => e.DiseaseId).HasName("PK__Disease__49A195572F40D203");
 
             entity.ToTable("Disease");
 
@@ -209,7 +209,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<Feedback>(entity =>
         {
-            entity.HasKey(e => e.FeedbackId).HasName("PK__Feedback__2613FDC47C975A2F");
+            entity.HasKey(e => e.FeedbackId).HasName("PK__Feedback__2613FDC4FE6E4CD0");
 
             entity.ToTable("Feedback");
 
@@ -226,55 +226,32 @@ public partial class VaccinationTrackingContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Feedbacks)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Feedback__accoun__03F0984C");
+                .HasConstraintName("FK__Feedback__accoun__04E4BC85");
 
             entity.HasOne(d => d.Appointment).WithMany(p => p.Feedbacks)
                 .HasForeignKey(d => d.AppointmentId)
-                .HasConstraintName("FK__Feedback__appoin__02FC7413");
+                .HasConstraintName("FK__Feedback__appoin__03F0984C");
         });
 
         modelBuilder.Entity<Image>(entity =>
         {
-            entity.HasKey(e => e.ImgId).HasName("PK__Image__C5BC81A6041E7745");
+            entity.HasKey(e => e.ImgId).HasName("PK__Image__C5BC81A6071DF04A");
 
             entity.ToTable("Image");
 
-            entity.Property(e => e.ImgId)
-                .ValueGeneratedNever()
-                .HasColumnName("imgId");
+            entity.Property(e => e.ImgId).HasColumnName("imgId");
             entity.Property(e => e.Img)
                 .HasMaxLength(255)
                 .HasColumnName("img");
-
-            entity.HasMany(d => d.Vaccinations).WithMany(p => p.Imgs)
-                .UsingEntity<Dictionary<string, object>>(
-                    "VaccinationImage",
-                    r => r.HasOne<Vaccination>().WithMany()
-                        .HasForeignKey("VaccinationId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__Vaccinati__vacci__6754599E"),
-                    l => l.HasOne<Image>().WithMany()
-                        .HasForeignKey("ImgId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__Vaccinati__imgId__66603565"),
-                    j =>
-                    {
-                        j.HasKey("ImgId", "VaccinationId").HasName("PK__Vaccinat__4E482FC68D256BE6");
-                        j.ToTable("Vaccination_Image");
-                        j.IndexerProperty<int>("ImgId").HasColumnName("imgId");
-                        j.IndexerProperty<int>("VaccinationId").HasColumnName("vaccinationId");
-                    });
         });
 
         modelBuilder.Entity<IntervalUnit>(entity =>
         {
-            entity.HasKey(e => e.UnitId).HasName("PK__Interval__55D79235F95A1965");
+            entity.HasKey(e => e.UnitId).HasName("PK__Interval__55D79235977EEDC6");
 
             entity.ToTable("IntervalUnit");
 
-            entity.Property(e => e.UnitId)
-                .ValueGeneratedNever()
-                .HasColumnName("unitId");
+            entity.Property(e => e.UnitId).HasColumnName("unitId");
             entity.Property(e => e.UnitName)
                 .HasMaxLength(10)
                 .HasColumnName("unitName");
@@ -282,7 +259,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<ParentChild>(entity =>
         {
-            entity.HasKey(e => e.ParentPatientId).HasName("PK__Parent_C__02E0DC71BF869697");
+            entity.HasKey(e => e.ParentPatientId).HasName("PK__Parent_C__02E0DC716E9167E3");
 
             entity.ToTable("Parent_Child");
 
@@ -303,7 +280,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<Patient>(entity =>
         {
-            entity.HasKey(e => e.PatientId).HasName("PK__Patient__A17005EC8F6C0F47");
+            entity.HasKey(e => e.PatientId).HasName("PK__Patient__A17005ECF0135DFE");
 
             entity.ToTable("Patient");
 
@@ -331,7 +308,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payment__A0D9EFA63216D0F9");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payment__A0D9EFA6DE5A9D16");
 
             entity.ToTable("Payment");
 
@@ -351,12 +328,12 @@ public partial class VaccinationTrackingContext : DbContext
             entity.HasOne(d => d.Appointment).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.AppointmentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payment__appoint__06CD04F7");
+                .HasConstraintName("FK__Payment__appoint__07C12930");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Role__CD98462A88B60A07");
+            entity.HasKey(e => e.RoleId).HasName("PK__Role__CD98462A85E03858");
 
             entity.ToTable("Role");
 
@@ -368,7 +345,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<TrafficLog>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TrafficL__3213E83FC4EA63B6");
+            entity.HasKey(e => e.Id).HasName("PK__TrafficL__3213E83F48153FD8");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AccountId).HasColumnName("accountId");
@@ -396,7 +373,7 @@ public partial class VaccinationTrackingContext : DbContext
 
         modelBuilder.Entity<Vaccination>(entity =>
         {
-            entity.HasKey(e => e.VaccinationId).HasName("PK__Vaccinat__BF4AE609C5059D46");
+            entity.HasKey(e => e.VaccinationId).HasName("PK__Vaccinat__BF4AE609F6C83D39");
 
             entity.ToTable("Vaccination");
 
@@ -427,30 +404,11 @@ public partial class VaccinationTrackingContext : DbContext
             entity.HasOne(d => d.Unit).WithMany(p => p.Vaccinations)
                 .HasForeignKey(d => d.UnitId)
                 .HasConstraintName("FK__Vaccinati__unitI__6383C8BA");
-
-            entity.HasMany(d => d.Diseases).WithMany(p => p.Vaccinations)
-                .UsingEntity<Dictionary<string, object>>(
-                    "VaccinationDisease",
-                    r => r.HasOne<Disease>().WithMany()
-                        .HasForeignKey("DiseaseId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__Vaccinati__disea__6B24EA82"),
-                    l => l.HasOne<Vaccination>().WithMany()
-                        .HasForeignKey("VaccinationId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__Vaccinati__vacci__6A30C649"),
-                    j =>
-                    {
-                        j.HasKey("VaccinationId", "DiseaseId").HasName("PK__Vaccinat__DBD0FF5C5395F9CB");
-                        j.ToTable("Vaccination_Disease");
-                        j.IndexerProperty<int>("VaccinationId").HasColumnName("vaccinationId");
-                        j.IndexerProperty<int>("DiseaseId").HasColumnName("diseaseId");
-                    });
         });
 
         modelBuilder.Entity<VaccinationAppointment>(entity =>
         {
-            entity.HasKey(e => e.AppointmentId).HasName("PK__Vaccinat__D067651E7E062855");
+            entity.HasKey(e => e.AppointmentId).HasName("PK__Vaccinat__D067651E4641C4EF");
 
             entity.ToTable("Vaccination_Appointment");
 
@@ -467,20 +425,41 @@ public partial class VaccinationTrackingContext : DbContext
             entity.HasOne(d => d.Account).WithMany(p => p.VaccinationAppointments)
                 .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Vaccinati__accou__76969D2E");
+                .HasConstraintName("FK__Vaccinati__accou__778AC167");
 
             entity.HasOne(d => d.Config).WithMany(p => p.VaccinationAppointments)
                 .HasForeignKey(d => d.ConfigId)
-                .HasConstraintName("FK__Vaccinati__confi__75A278F5");
+                .HasConstraintName("FK__Vaccinati__confi__76969D2E");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.VaccinationAppointments)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__Vaccinati__patie__74AE54BC");
+                .HasConstraintName("FK__Vaccinati__patie__75A278F5");
+        });
+
+        modelBuilder.Entity<VaccinationDisease>(entity =>
+        {
+            entity.HasKey(e => e.VaccinationDiseId).HasName("PK__Vaccinat__C7D778B049B8362E");
+
+            entity.ToTable("Vaccination_Disease");
+
+            entity.Property(e => e.VaccinationDiseId).HasColumnName("vaccinationDiseId");
+            entity.Property(e => e.DiseaseId).HasColumnName("diseaseId");
+            entity.Property(e => e.VaccinationId).HasColumnName("vaccinationId");
+
+            entity.HasOne(d => d.Disease).WithMany(p => p.VaccinationDiseases)
+                .HasForeignKey(d => d.DiseaseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Vaccinati__disea__6C190EBB");
+
+            entity.HasOne(d => d.Vaccination).WithMany(p => p.VaccinationDiseases)
+                .HasForeignKey(d => d.VaccinationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Vaccinati__vacci__6B24EA82");
         });
 
         modelBuilder.Entity<VaccinationHistory>(entity =>
         {
-            entity.HasKey(e => e.VaccinationId).HasName("PK__Vaccinat__BF4AE669FB60CE12");
+            entity.HasKey(e => e.VaccinationId).HasName("PK__Vaccinat__BF4AE669AEE74426");
 
             entity.ToTable("Vaccination_History");
 
@@ -498,21 +477,48 @@ public partial class VaccinationTrackingContext : DbContext
 
             entity.HasOne(d => d.Config).WithMany(p => p.VaccinationHistories)
                 .HasForeignKey(d => d.ConfigId)
-                .HasConstraintName("FK__Vaccinati__confi__7F2BE32F");
+                .HasConstraintName("FK__Vaccinati__confi__00200768");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.VaccinationHistories)
                 .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__Vaccinati__patie__7D439ABD");
+                .HasConstraintName("FK__Vaccinati__patie__7E37BEF6");
 
             entity.HasOne(d => d.Vaccine).WithMany(p => p.VaccinationHistories)
                 .HasForeignKey(d => d.VaccineId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Vaccinati__vacci__7E37BEF6");
+                .HasConstraintName("FK__Vaccinati__vacci__7F2BE32F");
+        });
+
+        modelBuilder.Entity<VaccinationImage>(entity =>
+        {
+            entity.HasKey(e => e.VaccinationImgId).HasName("PK__Vaccinat__058FD062C6C6DAB2");
+
+            entity.ToTable("Vaccination_Image");
+
+            entity.Property(e => e.VaccinationImgId).HasColumnName("vaccinationImgId");
+            entity.Property(e => e.AccountId).HasColumnName("accountId");
+            entity.Property(e => e.ImgId).HasColumnName("imgId");
+            entity.Property(e => e.VaccinationId).HasColumnName("vaccinationId");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.VaccinationImages)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Vaccinati__accou__68487DD7");
+
+            entity.HasOne(d => d.Img).WithMany(p => p.VaccinationImages)
+                .HasForeignKey(d => d.ImgId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Vaccinati__imgId__66603565");
+
+            entity.HasOne(d => d.Vaccination).WithMany(p => p.VaccinationImages)
+                .HasForeignKey(d => d.VaccinationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Vaccinati__vacci__6754599E");
         });
 
         modelBuilder.Entity<VaccinationService>(entity =>
         {
-            entity.HasKey(e => e.ServiceId).HasName("PK__Vaccinat__4550733FC5B87428");
+            entity.HasKey(e => e.ServiceId).HasName("PK__Vaccinat__4550733FC445B98B");
 
             entity.ToTable("Vaccination_Service");
 
@@ -532,15 +538,15 @@ public partial class VaccinationTrackingContext : DbContext
 
             entity.HasOne(d => d.Category).WithMany(p => p.VaccinationServices)
                 .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Vaccinati__categ__70DDC3D8");
+                .HasConstraintName("FK__Vaccinati__categ__71D1E811");
 
             entity.HasOne(d => d.Disease).WithMany(p => p.VaccinationServices)
                 .HasForeignKey(d => d.DiseaseId)
-                .HasConstraintName("FK__Vaccinati__disea__71D1E811");
+                .HasConstraintName("FK__Vaccinati__disea__72C60C4A");
 
             entity.HasOne(d => d.Vaccination).WithMany(p => p.VaccinationServices)
                 .HasForeignKey(d => d.VaccinationId)
-                .HasConstraintName("FK__Vaccinati__vacci__6FE99F9F");
+                .HasConstraintName("FK__Vaccinati__vacci__70DDC3D8");
         });
 
         OnModelCreatingPartial(modelBuilder);

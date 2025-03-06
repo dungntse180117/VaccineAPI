@@ -9,5 +9,5 @@ public partial class Image
 
     public string Img { get; set; } = null!;
 
-    public virtual ICollection<Vaccination> Vaccinations { get; set; } = new List<Vaccination>();
+    public virtual ICollection<VaccinationImage> VaccinationImages { get; set; } = new List<VaccinationImage>();
 }

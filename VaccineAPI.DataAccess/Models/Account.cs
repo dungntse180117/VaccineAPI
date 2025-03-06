@@ -34,4 +34,6 @@ public partial class Account
     public virtual ICollection<TrafficLog> TrafficLogs { get; set; } = new List<TrafficLog>();
 
     public virtual ICollection<VaccinationAppointment> VaccinationAppointments { get; set; } = new List<VaccinationAppointment>();
+
+    public virtual ICollection<VaccinationImage> VaccinationImages { get; set; } = new List<VaccinationImage>();
 }

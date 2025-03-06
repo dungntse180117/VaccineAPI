@@ -31,11 +31,11 @@ public partial class Vaccination
 
     public virtual IntervalUnit? Unit { get; set; }
 
+    public virtual ICollection<VaccinationDisease> VaccinationDiseases { get; set; } = new List<VaccinationDisease>();
+
     public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
 
+    public virtual ICollection<VaccinationImage> VaccinationImages { get; set; } = new List<VaccinationImage>();
+
     public virtual ICollection<VaccinationService> VaccinationServices { get; set; } = new List<VaccinationService>();
-
-    public virtual ICollection<Disease> Diseases { get; set; } = new List<Disease>();
-
-    public virtual ICollection<Image> Imgs { get; set; } = new List<Image>();
 }

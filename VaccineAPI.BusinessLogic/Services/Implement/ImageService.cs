@@ -1,53 +1,148 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using VaccineAPI.BusinessLogic.Interface;
 using VaccineAPI.DataAccess.Data;
 using VaccineAPI.DataAccess.Models;
+using VaccineAPI.Shared.Request;
+using VaccineAPI.Shared.Response;
 
 namespace VaccineAPI.BusinessLogic.Implement
 {
     public class ImageService : IImageService
     {
         private readonly VaccinationTrackingContext _context;
-        private readonly ILogger<ImageService> _logger;
+        private readonly string _imageBasePath;
+        private readonly ICloudService _cloudService; //Inject Cloud Service
 
-        public ImageService(VaccinationTrackingContext context, ILogger<ImageService> logger) //Add logger
+        public ImageService(VaccinationTrackingContext context, IConfiguration configuration, ICloudService cloudService)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _context = context;
+            _imageBasePath = configuration["ImageStorage:BasePath"];
+            _cloudService = cloudService; //Init Cloud Service
         }
 
-        public async Task<bool> SaveImagesAsync(string imageUrl)
+        public async Task<List<ImageResponse>> GetAllImagesAsync()
         {
-            if (string.IsNullOrEmpty(imageUrl))
-            {
-                throw new ArgumentException("Image URL cannot be null or empty.", nameof(imageUrl));
-            }
-            try
-            {
-                var banner = new Banner
-                {
-                    BannerName = imageUrl,
-                    //AccountId = you will need to link the account later but i have it nullable right now
-                };
+            var images = await _context.Images.ToListAsync();
+            return images.Select(MapToImageResponse).ToList();
+        }
 
-                _context.Banners.Add(banner);
-                await _context.SaveChangesAsync();
+        public async Task<ImageResponse> GetImageByIdAsync(int imageId)
+        {
+            var image = await _context.Images.FindAsync(imageId);
+            return image == null ? null : MapToImageResponse(image);
+        }
 
-                _logger.LogInformation($"Image URL saved to the database: {imageUrl}");// Log
-
-                return true;
-            }
-            catch (Exception ex)
+        public async Task<ImageResponse> CreateImageAsync(ImageRequest request)
+        {
+            var image = new Image
             {
-                _logger.LogError(ex, $"Error saving image URL to the database: {imageUrl}");// Log Error
+                Img = request.Img
+            };
+
+            _context.Images.Add(image);
+            await _context.SaveChangesAsync();
+
+            return MapToImageResponse(image);
+        }
+
+        public async Task<bool> DeleteImageAsync(int imageId)
+        {
+            var image = await _context.Images.FindAsync(imageId);
+            if (image == null)
+            {
                 return false;
             }
+
+            _context.Images.Remove(image);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<string> SaveImageAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new ArgumentException("Invalid file");
+            }
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(_imageBasePath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return $"/images/{fileName}";
+        }
+
+        private ImageResponse MapToImageResponse(Image image)
+        {
+            return new ImageResponse
+            {
+                ImageId = image.ImgId,
+                Img = image.Img
+            };
+        }
+        //public async Task<bool> SaveImagesAsync(string imageUrl) // Removed Old
+        //{
+        //    if (string.IsNullOrEmpty(imageUrl))
+        //    {
+        //        return false;
+        //    }
+
+        //    try
+        //    {
+        //        var image = new Image { Img = imageUrl };
+        //        _context.Images.Add(image);
+        //        await _context.SaveChangesAsync();
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error saving image: {ex.Message}");
+        //        return false;
+        //    }
+        //}
+
+        public async Task<ImageResponse> SaveVaccinationImageAsync(IFormFile file, int vaccinationId, int accountId)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new ArgumentException("Invalid file");
+            }
+
+            // 1. Upload image to cloud storage
+            var uploadResult = await _cloudService.UploadImageAsync(file);
+
+            if (uploadResult == null)
+            {
+                throw new Exception("Failed to upload image to Cloudinary.");
+            }
+
+            // 2. Save image information to the Image table
+            var image = new Image { Img = uploadResult.SecureUrl.ToString() };
+            _context.Images.Add(image);
+            await _context.SaveChangesAsync();
+
+            // 3. Create a record in the Vaccination_Image table
+            var vaccinationImage = new VaccinationImage
+            {
+                ImgId = image.ImgId,
+                VaccinationId = vaccinationId,
+                AccountId = accountId
+            };
+            _context.VaccinationImages.Add(vaccinationImage);
+            await _context.SaveChangesAsync();
+
+            return MapToImageResponse(image);
         }
     }
 }
-

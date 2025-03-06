@@ -19,6 +19,7 @@ using VaccineAPI.BusinessLogic.Interface;
 using VaccineAPI.DataAccess.Models;
 using VaccineAPI.BusinessLogic.Services;
 using VaccinationService = VaccineAPI.BusinessLogic.Services.Implement.VaccinationService;
+using VaccineAPI.Shared.Helpers.Photo;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,9 +29,6 @@ builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSet
 //builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
 //builder.Services.AddScoped<IChildService, ChildService>();
 //builder.Services.AddScoped<IFeedbackService, FeedbackService>();
-builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IPatientService, PatientService>();
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -82,10 +80,14 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Add services
+builder.Services.Configure<CloundSettings>(builder.Configuration.GetSection(nameof(CloundSettings)));
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IDiseaseService, DiseaseService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<ICloudService, CloudService>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
