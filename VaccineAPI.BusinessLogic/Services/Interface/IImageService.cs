@@ -17,6 +17,7 @@ namespace VaccineAPI.BusinessLogic.Interface
         Task<bool> DeleteImageAsync(int imageId);
         Task<string> SaveImageAsync(IFormFile file);
         Task<ImageResponse> SaveVaccinationImageAsync(IFormFile file, int vaccinationId, int accountId);
+        Task<string> GetVaccinationImageUrlAsync(int vaccinationId);
     }
 }
     

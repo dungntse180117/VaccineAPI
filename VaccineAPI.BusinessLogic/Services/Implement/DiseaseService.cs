@@ -91,5 +91,62 @@ namespace VaccineAPI.BusinessLogic.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task AssociateVaccinationWithDiseases(int vaccinationId, int diseaseId)
+        {
+            if (vaccinationId <= 0)
+            {
+                throw new ArgumentException("Vaccination ID phải lớn hơn 0.");
+            }
+            if (diseaseId <= 0)
+            {
+                throw new ArgumentException("Disease ID phải lớn hơn 0.");
+            }
+
+            var vaccination = await _context.Vaccinations.FindAsync(vaccinationId);
+            if (vaccination == null)
+            {
+                throw new ArgumentException($"Vaccination với ID {vaccinationId} không tồn tại.");
+            }
+
+            var disease = await _context.Diseases.FindAsync(diseaseId);
+            if (disease == null)
+            {
+                throw new ArgumentException($"Disease với ID {diseaseId} không tồn tại.");
+            }
+
+            var vaccinationDisease = await _context.VaccinationDiseases
+                .FirstOrDefaultAsync(vd => vd.VaccinationId == vaccinationId && vd.DiseaseId == diseaseId);
+
+            if (vaccinationDisease != null)
+            {
+                throw new InvalidOperationException($"Bệnh {disease.DiseaseName} đã có được thêm và vaccine {vaccination.VaccinationName}.");
+            }
+
+            
+            var newVaccinationDisease = new VaccinationDisease { VaccinationId = vaccinationId, DiseaseId = diseaseId };
+            _context.VaccinationDiseases.Add(newVaccinationDisease);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<DiseaseResponse>> GetDiseaseByVaccinationId(int vaccinationId)
+        {
+            if (vaccinationId <= 0)
+            {
+                throw new ArgumentException("Vaccination ID phải lớn hơn 0.");
+            }
+            List<DiseaseResponse> diseaseResponses = await _context.VaccinationDiseases
+            .Where(v => v.VaccinationId == vaccinationId)
+            .Include(v => v.Disease)
+            .Select(v => new DiseaseResponse
+            {
+                DiseaseId = v.Disease.DiseaseId,
+                DiseaseName = v.Disease.DiseaseName,
+                Description = v.Disease.Description,
+            })
+            .ToListAsync();
+            return diseaseResponses;
+        }
     }
 }
+

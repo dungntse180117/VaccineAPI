@@ -3,6 +3,7 @@ using VaccineAPI.BusinessLogic.Services.Interface;
 using VaccineAPI.BusinessLogic.Services.Implement;
 using VaccineAPI.Shared.Request;
 using VaccineAPI.Shared.Response;
+using VaccineAPI.DataAccess.Models;
 
 namespace VaccineAPI.Controllers
 {
@@ -11,7 +12,7 @@ namespace VaccineAPI.Controllers
     public class DiseaseController : ControllerBase
     {
         private readonly IDiseaseService _diseaseService;
-
+        
         public DiseaseController(IDiseaseService diseaseService)
         {
             _diseaseService = diseaseService;
@@ -69,6 +70,44 @@ namespace VaccineAPI.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpPost("{vaccinationId}/AssociateDiseases/{diseaseId}")]
+        public async Task<IActionResult> AssociateVaccinationWithDiseases(int vaccinationId, int diseaseId)
+        {
+            try
+            {
+                await _diseaseService.AssociateVaccinationWithDiseases(vaccinationId, diseaseId);
+                return Ok("Vaccination associated with diseases successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error associating vaccination with diseases: {ex.Message}");
+                return StatusCode(500, "Internal server error.");
+            }
+        }
+
+        [HttpGet("GetDiseaseByVaccinationId/{vaccinationId}")]
+        public async Task<IActionResult> GetDiseaseByVaccinationId(int vaccinationId)
+        {
+            try
+            {
+                List<DiseaseResponse> diseases = await _diseaseService.GetDiseaseByVaccinationId(vaccinationId);
+                return Ok(diseases);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error connecting Get Disease by Vaccination ID with message: {ex.Message}");
+                return StatusCode(500, "Error connecting Get Disease by Vaccination ID.");
+            }
         }
     }
 }

@@ -15,5 +15,7 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
         Task<DiseaseResponse> CreateDisease(CreateDiseaseRequest createDiseaseRequest);
         Task<DiseaseResponse> UpdateDisease(int id, UpdateDiseaseRequest updateDiseaseRequest);
         Task<bool> DeleteDisease(int id);
+        Task AssociateVaccinationWithDiseases(int vaccinationId, int diseaseId);
+        Task<List<DiseaseResponse>> GetDiseaseByVaccinationId(int vaccinationId);
     }
 }

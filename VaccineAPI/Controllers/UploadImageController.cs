@@ -58,5 +58,27 @@ namespace VaccineAPI.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, "Error uploading file and saving vaccination image information.");
             }
         }
+        [HttpGet("GetVaccinationImage/{vaccinationId}")]
+        public async Task<ActionResult<string>> GetVaccinationImage(int vaccinationId)
+        {
+            try
+            {
+                string imageUrl = await _imageService.GetVaccinationImageUrlAsync(vaccinationId);
+
+                if (imageUrl == null)  // Changed from string.IsNullOrEmpty
+                {
+                    _logger.LogWarning($"No image found for vaccination ID: {vaccinationId}");
+                    return NotFound("No image found for vaccination."); // Or return an empty string, depending on what you want
+                }
+
+                _logger.LogInformation($"Image URL retrieved for vaccination ID: {vaccinationId}, URL: {imageUrl}");
+                return Ok(imageUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving image URL for vaccination ID: {vaccinationId}");
+                return StatusCode(500, "Error retrieving image URL.");
+            }
+        }
     }
 }

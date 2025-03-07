@@ -91,27 +91,6 @@ namespace VaccineAPI.BusinessLogic.Implement
                 Img = image.Img
             };
         }
-        //public async Task<bool> SaveImagesAsync(string imageUrl) // Removed Old
-        //{
-        //    if (string.IsNullOrEmpty(imageUrl))
-        //    {
-        //        return false;
-        //    }
-
-        //    try
-        //    {
-        //        var image = new Image { Img = imageUrl };
-        //        _context.Images.Add(image);
-        //        await _context.SaveChangesAsync();
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Error saving image: {ex.Message}");
-        //        return false;
-        //    }
-        //}
-
         public async Task<ImageResponse> SaveVaccinationImageAsync(IFormFile file, int vaccinationId, int accountId)
         {
             if (file == null || file.Length == 0)
@@ -143,6 +122,27 @@ namespace VaccineAPI.BusinessLogic.Implement
             await _context.SaveChangesAsync();
 
             return MapToImageResponse(image);
+        }
+        public async Task<string> GetVaccinationImageUrlAsync(int vaccinationId)
+        {
+            try
+            {
+                var vaccinationImage = await _context.VaccinationImages
+                   .Include(vi => vi.Img) // Eagerly load the Image
+                   .FirstOrDefaultAsync(vi => vi.VaccinationId == vaccinationId);
+
+                if (vaccinationImage == null || vaccinationImage.Img == null)
+                {
+                    return null; // Or throw an exception if you prefer
+                }
+
+                return vaccinationImage.Img.Img;
+            }
+            catch (Exception ex)
+            {
+                
+                return null;
+            }
         }
     }
 }

@@ -87,7 +87,6 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 _context.Vaccinations.Add(vaccination);
                 await _context.SaveChangesAsync();
 
-                // Map đối tượng Vaccination vừa tạo sang VaccinationResponse
                 return new VaccinationResponse
                 {
                     VaccinationId = vaccination.VaccinationId,
@@ -105,7 +104,6 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch
             {
-                // Xử lý lỗi (ví dụ: ghi log)
                 return null;
             }
         }
@@ -151,7 +149,6 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch
             {
-                // Xử lý lỗi
                 return null;
             }
         }
@@ -167,14 +164,48 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     return false;
                 }
 
+                // *XÓA CÁC LIÊN KẾT VACCINATION_DISEASE*
+                var vaccinationDiseases = await _context.VaccinationDiseases
+                    .Where(vd => vd.VaccinationId == id)
+                    .ToListAsync();
+
+                _context.VaccinationDiseases.RemoveRange(vaccinationDiseases);
+
+
+                //  Xóa VaccinationImage và Image
+                var vaccinationImages = await _context.VaccinationImages
+                    .Where(vi => vi.VaccinationId == id)
+                    .ToListAsync();
+
+                foreach (var vi in vaccinationImages)
+                {
+                    int imgId = vi.ImgId;
+
+                    _context.VaccinationImages.Remove(vi);
+
+                    var anyOtherVaccinationUsingThisImage = await _context.VaccinationImages
+                        .AnyAsync(x => x.ImgId == imgId && x.VaccinationId != id);
+
+                    if (!anyOtherVaccinationUsingThisImage)
+                    {
+                        var image = await _context.Images.FindAsync(imgId);
+                        if (image != null)
+                        {
+                            _context.Images.Remove(image);
+                        }
+                    }
+                }
+
+                // Cuối cùng, xóa Vaccination
                 _context.Vaccinations.Remove(vaccination);
+
                 await _context.SaveChangesAsync();
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                // Xử lý lỗi
+                Console.Error.WriteLine($"Error deleting vaccination: {ex}");
                 return false;
             }
         }
