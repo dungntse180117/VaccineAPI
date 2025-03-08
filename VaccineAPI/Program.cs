@@ -88,12 +88,17 @@ builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ICloudService, CloudService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IVaccinationServiceService, VaccinationServiceService>();
+
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
     });
+builder.Services.AddScoped<VaccineAPI.BusinessLogic.Services.Interface.IVaccinationService, VaccineAPI.BusinessLogic.Services.Implement.VaccinationService>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
