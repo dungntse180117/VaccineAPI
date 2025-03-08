@@ -84,25 +84,31 @@ namespace VaccineAPI.BusinessLogic.Services
 
         public async Task<bool> DeleteDisease(int id)
         {
-            Disease disease = await _context.Diseases.FindAsync(id);
-            if (disease == null) return false;
+            try
+            {
+                Disease disease = await _context.Diseases.FindAsync(id);
+                if (disease == null) return false;
+       
+                var vaccinationDiseases = await _context.VaccinationDiseases
+                    .Where(vd => vd.DiseaseId == id)
+                    .ToListAsync();
 
-            _context.Diseases.Remove(disease);
-            await _context.SaveChangesAsync();
-            return true;
+                _context.VaccinationDiseases.RemoveRange(vaccinationDiseases);
+
+                _context.Diseases.Remove(disease);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error deleting disease: {ex}");
+                return false;
+            }
         }
 
         public async Task AssociateVaccinationWithDiseases(int vaccinationId, int diseaseId)
         {
-            if (vaccinationId <= 0)
-            {
-                throw new ArgumentException("Vaccination ID phải lớn hơn 0.");
-            }
-            if (diseaseId <= 0)
-            {
-                throw new ArgumentException("Disease ID phải lớn hơn 0.");
-            }
-
             var vaccination = await _context.Vaccinations.FindAsync(vaccinationId);
             if (vaccination == null)
             {
@@ -120,7 +126,7 @@ namespace VaccineAPI.BusinessLogic.Services
 
             if (vaccinationDisease != null)
             {
-                throw new InvalidOperationException($"Bệnh {disease.DiseaseName} đã có được thêm và vaccine {vaccination.VaccinationName}.");
+                throw new InvalidOperationException($"Bệnh {disease.DiseaseName} đã được thêm vào vaccine {vaccination.VaccinationName}.");
             }
 
             
