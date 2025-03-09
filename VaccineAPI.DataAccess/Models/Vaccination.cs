@@ -37,5 +37,5 @@ public partial class Vaccination
 
     public virtual ICollection<VaccinationImage> VaccinationImages { get; set; } = new List<VaccinationImage>();
 
-    public virtual ICollection<VaccinationService> VaccinationServices { get; set; } = new List<VaccinationService>();
+    public virtual ICollection<VaccinationServiceVaccination> VaccinationServiceVaccinations { get; set; } = new List<VaccinationServiceVaccination>();
 }

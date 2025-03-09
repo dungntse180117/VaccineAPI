@@ -12,6 +12,4 @@ public partial class Disease
     public string? Description { get; set; }
 
     public virtual ICollection<VaccinationDisease> VaccinationDiseases { get; set; } = new List<VaccinationDisease>();
-
-    public virtual ICollection<VaccinationService> VaccinationServices { get; set; } = new List<VaccinationService>();
 }

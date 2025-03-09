@@ -11,9 +11,7 @@ public partial class VaccinationService
 
     public int? CategoryId { get; set; }
 
-    public int? DiseaseId { get; set; }
-
-    public int? VaccinationId { get; set; }
+    public int? TotalDoses { get; set; }
 
     public decimal Price { get; set; }
 
@@ -23,7 +21,5 @@ public partial class VaccinationService
 
     public virtual Category? Category { get; set; }
 
-    public virtual Disease? Disease { get; set; }
-
-    public virtual Vaccination? Vaccination { get; set; }
+    public virtual ICollection<VaccinationServiceVaccination> VaccinationServiceVaccinations { get; set; } = new List<VaccinationServiceVaccination>();
 }
