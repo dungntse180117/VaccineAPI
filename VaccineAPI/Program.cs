@@ -26,9 +26,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-//builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
-//builder.Services.AddScoped<IChildService, ChildService>();
-//builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
