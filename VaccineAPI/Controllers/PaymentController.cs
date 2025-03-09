@@ -26,6 +26,6 @@ namespace VaccineAPI.Controllers
             }
 
             return BadRequest(new { success = false, error = message });
-        }
+        } 
     }
 }
