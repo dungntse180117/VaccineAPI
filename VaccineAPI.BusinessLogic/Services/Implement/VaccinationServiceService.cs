@@ -74,8 +74,10 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             Vaccinations = vs.VaccinationServiceVaccinations
                 .Select(vsv => new VaccinationInfo
                 {
-                    VaccinationId = vsv.VaccinationId ?? 0, // Lấy VaccinationId từ bảng liên kết
+                    VaccinationId = vsv.VaccinationId ?? 0,
                     VaccinationName = vsv.Vaccination.VaccinationName,
+                    Price = (decimal)vsv.Vaccination.Price, 
+                    TotalDoses = (int)vsv.Vaccination.TotalDoses,
                     Diseases = vsv.Vaccination.VaccinationDiseases
                         .Select(vd => vd.Disease.DiseaseName)
                         .ToList()
@@ -141,12 +143,18 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
 
         public async Task CreateVaccinationServiceVaccination(VaccinationServiceVaccinationRequest request)
         {
+            var vaccination = await _context.Vaccinations.FindAsync(request.VaccinationID);
+            if (vaccination == null)
+            {
+                throw new KeyNotFoundException("Không tìm thấy vaccine với ID " + request.VaccinationID);
+            }
+
             var existingVaccinationServiceVaccination = await _context.VaccinationServiceVaccinations
                 .FirstOrDefaultAsync(vsv => vsv.VaccinationId == request.VaccinationID && vsv.ServiceId == request.ServiceID);
 
             if (existingVaccinationServiceVaccination != null)
             {
-                throw new InvalidOperationException("Vaccine này đã được thêm vào gói này rồi.");
+                throw new InvalidOperationException($"Vaccine {vaccination.VaccinationName} đã được thêm vào gói này rồi.");
             }
             var vaccinationServiceVaccination = new VaccinationServiceVaccination
             {
@@ -157,6 +165,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             _context.VaccinationServiceVaccinations.Add(vaccinationServiceVaccination);
             await _context.SaveChangesAsync();
 
+           
             await UpdateVaccinationServicePriceAndDoses(request.ServiceID);
         }
 

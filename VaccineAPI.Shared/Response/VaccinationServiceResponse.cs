@@ -23,6 +23,8 @@ namespace VaccineAPI.Shared.Response
     {
         public int VaccinationId { get; set; }
         public string VaccinationName { get; set; }
+        public decimal Price { get; set; } 
+        public int TotalDoses { get; set; } 
         public List<string> Diseases { get; set; } = new List<string>();
     }
 }

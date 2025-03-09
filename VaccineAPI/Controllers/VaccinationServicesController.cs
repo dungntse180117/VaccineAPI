@@ -131,7 +131,15 @@ namespace VaccineAPI.Controllers
             try
             {
                 await _vaccinationService.CreateVaccinationServiceVaccination(request);
-                return Ok(); 
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception)
             {
