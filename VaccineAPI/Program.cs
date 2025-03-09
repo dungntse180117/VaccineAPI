@@ -28,6 +28,9 @@ builder.Services.AddScoped<IChildService, ChildService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddHttpClient<IPaymentService, PaymentService>();
+builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
