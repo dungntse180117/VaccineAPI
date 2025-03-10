@@ -29,6 +29,8 @@ public partial class Vaccination
 
     public virtual AgeUnit? AgeUnit { get; set; }
 
+    public virtual ICollection<RegistrationVaccination> RegistrationVaccinations { get; set; } = new List<RegistrationVaccination>();
+
     public virtual IntervalUnit? Unit { get; set; }
 
     public virtual ICollection<VaccinationDisease> VaccinationDiseases { get; set; } = new List<VaccinationDisease>();

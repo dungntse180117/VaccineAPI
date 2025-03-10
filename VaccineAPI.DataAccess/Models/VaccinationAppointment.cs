@@ -7,11 +7,9 @@ public partial class VaccinationAppointment
 {
     public int AppointmentId { get; set; }
 
+    public int RegistrationId { get; set; }
+
     public DateOnly? AppointmentDate { get; set; }
-
-    public int AccountId { get; set; }
-
-    public int? PatientId { get; set; }
 
     public int? ConfigId { get; set; }
 
@@ -19,15 +17,13 @@ public partial class VaccinationAppointment
 
     public string? Status { get; set; }
 
-    public virtual Account Account { get; set; } = null!;
+    public string? Notes { get; set; }
 
     public virtual ICollection<AppointmentService> AppointmentServices { get; set; } = new List<AppointmentService>();
 
     public virtual Configuration? Config { get; set; }
 
-    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+    public virtual Registration Registration { get; set; } = null!;
 
-    public virtual Patient? Patient { get; set; }
-
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
 }

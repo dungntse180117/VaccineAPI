@@ -21,5 +21,7 @@ public partial class VaccinationService
 
     public virtual Category? Category { get; set; }
 
+    public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
+
     public virtual ICollection<VaccinationServiceVaccination> VaccinationServiceVaccinations { get; set; } = new List<VaccinationServiceVaccination>();
 }
