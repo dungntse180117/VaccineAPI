@@ -88,6 +88,7 @@ builder.Services.AddScoped<ICloudService, CloudService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IVaccinationServiceService, VaccinationServiceService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IRegistrationDetailService, RegistrationDetailService>();
 
 builder.Services.AddControllers();
 builder.Services.AddControllers()

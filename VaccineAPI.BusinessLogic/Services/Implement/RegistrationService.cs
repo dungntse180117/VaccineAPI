@@ -126,10 +126,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
         }
 
-        public async Task CreateRegistrationDetailsAsync(int registrationId)
-        {
-
-        }
+      
 
         public async Task<RegistrationResponse?> GetRegistrationAsync(int id)
         {
@@ -161,8 +158,9 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
         }
 
-        public async Task<IActionResult> UpdateRegistrationAsync(int id, UpdateRegistrationRequest request)
+        public async Task<IActionResult> UpdateRegistrationInfoAsync(int id, UpdateRegistrationRequest request)
         {
+            using var transaction = _context.Database.BeginTransaction();
             try
             {
                 var registration = await _context.Registrations.FindAsync(id);
@@ -185,14 +183,11 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 {
                     registration.TotalAmount = request.TotalAmount.Value;
                 }
-                if (!string.IsNullOrEmpty(request.Status))
-                {
-                    registration.Status = request.Status;
-                }
                 if (request.DesiredDate.HasValue)
                 {
-                    registration.TotalAmount = request.TotalAmount.Value;
+                    registration.DesiredDate = request.DesiredDate.Value;
                 }
+
                 await _context.SaveChangesAsync();
 
                 var response = new RegistrationResponse
@@ -205,15 +200,129 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     DesiredDate = registration.DesiredDate
                 };
 
+                transaction.Commit();
                 return new OkObjectResult(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi UpdateRegistration with ID: {id}.", id);
+                transaction.Rollback();
+                _logger.LogError(ex, "Lỗi khi UpdateRegistrationInfo with ID: {id}.", id);
                 return new StatusCodeResult(500);
             }
         }
+        public async Task CreateRegistrationDetailsAsync(int registrationId)
+        {
+            //Loại bỏ using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                var registration = await _context.Registrations
+                    .Include(r => r.RegistrationPatients)
+                    .Include(r => r.RegistrationVaccinations)
+                    .FirstOrDefaultAsync(r => r.RegistrationId == registrationId);
 
+                if (registration == null)
+                {
+                    throw new ArgumentException($"Không tìm thấy Registration với ID = {registrationId}");
+                }
+
+                // 3. Tạo RegistrationDetail cho từng bệnh nhân
+                foreach (var registrationPatient in registration.RegistrationPatients)
+                {
+                    //Lấy giá
+                    decimal priceForPatient = 0;
+                    int quantity = 0;
+                    if (registration.ServiceId != null)
+                    {
+                        var service = await _context.VaccinationServices.FindAsync(registration.ServiceId);
+                        if (service == null)
+                        {
+                            throw new ArgumentException($"Không tìm thấy service với ID = {registration.ServiceId}");
+                        }
+                        priceForPatient = service.Price;
+                        quantity = (int)service.TotalDoses;
+                    }
+                    else
+                    {
+                        foreach (var item in registration.RegistrationVaccinations)
+                        {
+                            if (item.VaccinationId != null)
+                            {
+                                var vaccine = await _context.Vaccinations.FindAsync(item.VaccinationId);
+                                if (vaccine == null)
+                                {
+                                    throw new ArgumentException($"Không tìm thấy vắc xin với ID = {item.VaccinationId}");
+                                }
+                                priceForPatient += (decimal)vaccine.Price;
+                                quantity += (int)vaccine.TotalDoses;
+                            }
+                        }
+                    }
+
+                    // Tạo RegistrationDetail
+                    var registrationDetail = new RegistrationDetail
+                    {
+                        RegistrationId = registration.RegistrationId,
+                        PatientId = registrationPatient.PatientId,
+                        Quantity = quantity,
+                        Price = priceForPatient,
+                        DesiredDate = registration.DesiredDate,
+                        Status = "Pending"
+                    };
+
+                    _context.RegistrationDetails.Add(registrationDetail);
+                }
+
+                await _context.SaveChangesAsync();
+
+                //transaction.Commit(); //Di chuyển transaction ra bên ngoài
+            }
+            catch (Exception ex)
+            {
+                //transaction.Rollback();
+                _logger.LogError(ex, "Lỗi khi tạo RegistrationDetails cho RegistrationId: {registrationId}.", registrationId);
+                throw;
+            }
+        }
+        public async Task<IActionResult> UpdateRegistrationStatusAsync(int id, UpdateRegistrationStatusRequest request)
+        {
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                var registration = await _context.Registrations.FindAsync(id);
+
+                if (registration == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                registration.Status = request.Status;
+
+                await _context.SaveChangesAsync();
+
+                var response = new RegistrationResponse
+                {
+                    registrationID = registration.RegistrationId,
+                    AccountId = registration.AccountId,
+                    RegistrationDate = registration.RegistrationDate,
+                    TotalAmount = registration.TotalAmount,
+                    Status = registration.Status,
+                    DesiredDate = registration.DesiredDate
+                };
+                if (request.Status == "Confirmed")
+                {
+                    await CreateRegistrationDetailsAsync(id);
+                }
+
+                transaction.Commit();
+                return new OkObjectResult(response);
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogError(ex, "Lỗi khi UpdateRegistrationStatus with ID: {id}.", id);
+                return new StatusCodeResult(500);
+            }
+        }
         public async Task<IActionResult> DeleteRegistrationAsync(int id)
         {
             try

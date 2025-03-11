@@ -13,8 +13,10 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
     {
         Task<RegistrationResponse> CreateRegistrationAsync(CreateRegistrationRequest request);
         Task<RegistrationResponse?> GetRegistrationAsync(int id);
-        Task<IActionResult> UpdateRegistrationAsync(int id, UpdateRegistrationRequest request);
+        Task<IActionResult> UpdateRegistrationInfoAsync(int id, UpdateRegistrationRequest request);
         Task<IActionResult> DeleteRegistrationAsync(int id);
+        Task<IActionResult> UpdateRegistrationStatusAsync(int id, UpdateRegistrationStatusRequest request);
         Task CreateRegistrationDetailsAsync(int registrationId);
     }
 }
+

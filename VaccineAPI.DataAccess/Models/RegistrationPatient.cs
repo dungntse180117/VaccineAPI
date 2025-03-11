@@ -14,6 +14,4 @@ public partial class RegistrationPatient
     public virtual Patient Patient { get; set; } = null!;
 
     public virtual Registration Registration { get; set; } = null!;
-
-    public virtual ICollection<RegistrationDetail> RegistrationDetails { get; set; } = new List<RegistrationDetail>();
 }

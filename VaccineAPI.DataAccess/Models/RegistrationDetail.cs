@@ -7,7 +7,7 @@ public partial class RegistrationDetail
 {
     public int RegistrationDetailId { get; set; }
 
-    public int RegistrationPatientId { get; set; }
+    public int RegistrationId { get; set; }
 
     public int Quantity { get; set; }
 
@@ -15,5 +15,11 @@ public partial class RegistrationDetail
 
     public decimal Price { get; set; }
 
-    public virtual RegistrationPatient RegistrationPatient { get; set; } = null!;
+    public int? PatientId { get; set; }
+
+    public string? Status { get; set; }
+
+    public virtual Patient? Patient { get; set; }
+
+    public virtual Registration Registration { get; set; } = null!;
 }

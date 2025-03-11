@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -74,7 +75,7 @@ namespace VaccineAPI.Controllers
 
             try
             {
-                return await _registrationService.UpdateRegistrationAsync(id, request);
+                return await _registrationService.UpdateRegistrationInfoAsync(id, request);
             }
             catch (Exception ex)
             {
@@ -82,7 +83,19 @@ namespace VaccineAPI.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateRegistrationStatus(int id, [FromBody] UpdateRegistrationStatusRequest request)
+        {
+            try
+            {
+                return await _registrationService.UpdateRegistrationStatusAsync(id, request);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi UpdateRegistrationStatus with ID: {id}.", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRegistration(int id)
         {

@@ -23,5 +23,7 @@ public partial class Patient
 
     public virtual ICollection<ParentChild> ParentChildren { get; set; } = new List<ParentChild>();
 
+    public virtual ICollection<RegistrationDetail> RegistrationDetails { get; set; } = new List<RegistrationDetail>();
+
     public virtual ICollection<RegistrationPatient> RegistrationPatients { get; set; } = new List<RegistrationPatient>();
 }
