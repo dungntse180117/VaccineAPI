@@ -5,8 +5,6 @@ namespace VaccineAPI.DataAccess.Models;
 
 public partial class Registration
 {
-    public int accountId;
-
     public int RegistrationId { get; set; }
 
     public int AccountId { get; set; }
@@ -32,6 +30,4 @@ public partial class Registration
     public virtual ICollection<RegistrationVaccination> RegistrationVaccinations { get; set; } = new List<RegistrationVaccination>();
 
     public virtual VaccinationService? Service { get; set; }
-
-    public virtual ICollection<VaccinationAppointment> VaccinationAppointments { get; set; } = new List<VaccinationAppointment>();
 }

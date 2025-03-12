@@ -17,8 +17,6 @@ public partial class VaccinationService
 
     public string? Description { get; set; }
 
-    public virtual ICollection<AppointmentService> AppointmentServices { get; set; } = new List<AppointmentService>();
-
     public virtual Category? Category { get; set; }
 
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();

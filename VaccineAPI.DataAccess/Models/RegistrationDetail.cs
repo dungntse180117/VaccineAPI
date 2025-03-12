@@ -19,6 +19,8 @@ public partial class RegistrationDetail
 
     public string? Status { get; set; }
 
+    public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+
     public virtual Patient? Patient { get; set; }
 
     public virtual Registration Registration { get; set; } = null!;

@@ -7,9 +7,9 @@ public partial class VaccinationHistory
 {
     public int VaccinationHistoryId { get; set; }
 
-    public int AppointmentId { get; set; }
+    public int VisitId { get; set; }
 
-    public DateOnly VaccinationDate { get; set; }
+    public DateTime VaccinationDate { get; set; }
 
     public string? Reaction { get; set; }
 
@@ -17,9 +17,13 @@ public partial class VaccinationHistory
 
     public string? Notes { get; set; }
 
-    public virtual VaccinationAppointment Appointment { get; set; } = null!;
+    public int? PatientId { get; set; }
 
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
+    public virtual Patient? Patient { get; set; }
+
     public virtual Vaccination Vaccine { get; set; } = null!;
+
+    public virtual Visit Visit { get; set; } = null!;
 }
