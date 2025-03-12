@@ -90,7 +90,8 @@ builder.Services.AddScoped<IVaccinationServiceService, VaccinationServiceService
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IRegistrationDetailService, RegistrationDetailService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-
+builder.Services.AddScoped<IVisitService, VisitService>();
+builder.Services.AddLogging();
 
 builder.Services.AddControllers();
 builder.Services.AddControllers()

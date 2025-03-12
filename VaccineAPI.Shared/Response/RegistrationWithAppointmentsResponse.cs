@@ -36,5 +36,6 @@ namespace VaccineAPI.Shared.Response
         public int TotalDoses { get; set; }
         public int DosesRemaining { get; set; }
         public string Status { get; set; }
+        public int DosesScheduled { get; set; }
     }
 }

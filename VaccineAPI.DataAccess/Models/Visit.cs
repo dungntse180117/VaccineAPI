@@ -19,5 +19,7 @@ public partial class Visit
 
     public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
 
+    public virtual ICollection<VisitDayChangeRequest> VisitDayChangeRequests { get; set; } = new List<VisitDayChangeRequest>();
+
     public virtual ICollection<VisitVaccination> VisitVaccinations { get; set; } = new List<VisitVaccination>();
 }

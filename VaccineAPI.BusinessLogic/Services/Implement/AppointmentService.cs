@@ -77,7 +77,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 AppointmentDate = request.AppointmentDate,
                 ConfigId = 1,
                 AppointmentNumber = request.AppointmentNumber,
-                Status = "Scheduled", // Trạng thái mặc định
+                Status = "Chưa được lên lịch", // Trạng thái mặc định
                 Notes = request.Notes
             };
 
@@ -138,7 +138,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                         VaccinationId = vaccinationId,
                         TotalDoses = (int)vaccine.TotalDoses,
                         DosesRemaining = (int)vaccine.TotalDoses,
-                        Status = "Chờ tiêm",
+                        Status = "Chưa lên lịch",
                         DosesScheduled = (int)vaccine.TotalDoses,
                         VaccinationName = vaccine.VaccinationName
                     };
@@ -294,7 +294,9 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     VaccinationName = av.Vaccination.VaccinationName,
                     TotalDoses = av.TotalDoses,
                     DosesRemaining = av.DosesRemaining,
-                    Status = av.Status
+                    Status = av.Status,
+                    DosesScheduled = av.DosesScheduled,
+                    
                 })
                 .ToList();
 
