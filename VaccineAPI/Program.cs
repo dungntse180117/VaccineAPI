@@ -92,6 +92,7 @@ builder.Services.AddScoped<IRegistrationDetailService, RegistrationDetailService
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IVisitService, VisitService>();
 builder.Services.AddScoped<IVisitDayChangeRequestService, VisitDayChangeRequestService>();
+builder.Services.AddScoped<IVaccinationHistoryService, VaccinationHistoryService>();
 
 builder.Services.AddControllers();
 builder.Services.AddControllers()
