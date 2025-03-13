@@ -26,6 +26,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+<<<<<<< HEAD
+builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
+builder.Services.AddScoped<IChildService, ChildService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
+builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+=======
+>>>>>>> c0ae67172736628d05eca0002eb6e8ff78dd46cc
 
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
@@ -114,6 +125,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
