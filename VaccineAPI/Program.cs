@@ -28,7 +28,8 @@ builder.Services.AddScoped<IChildService, ChildService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddHttpClient<IPaymentService, PaymentService>();
+
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
 
 // Configure DbContext
@@ -97,6 +98,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

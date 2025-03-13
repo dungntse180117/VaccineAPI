@@ -1,31 +1,43 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VaccineAPI.Services;
-using VaccineAPI.Shared.Request;
+using VaccineAPI.DataAccess.Models;
+using VaccineAPI.Shared.Response;
 
 namespace VaccineAPI.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/payments")]
-    public class PaymentController : ControllerBase
+    public class VnPayController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
+        private readonly IVnPayService _vnPayService;
 
-        public PaymentController(IPaymentService paymentService)
+        public VnPayController(IVnPayService vnPayService)
         {
-            _paymentService = paymentService;
+            _vnPayService = vnPayService;
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreatePayment([FromBody] PaymentRequest request)
+        [HttpPost("create-payment")]
+        public IActionResult CreatePayment([FromBody] VnPaymentRequestModel model)
         {
-            var (isSuccess, message) = await _paymentService.CreatePaymentAsync(request);
-
-            if (isSuccess)
+            var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
+            if (string.IsNullOrEmpty(paymentUrl))
             {
-                return Ok(new { success = true, paymentUrl = message });
+                return BadRequest("Failed to generate payment URL.");
             }
 
-            return BadRequest(new { success = false, error = message });
+            return Ok(new { PaymentUrl = paymentUrl });
+        }
+
+        [HttpGet("payment-return")]
+        public IActionResult PaymentReturn()
+        {
+            var response = _vnPayService.PaymentExecute(Request.Query);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
         }
     }
 }
