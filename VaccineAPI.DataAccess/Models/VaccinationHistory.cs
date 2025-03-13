@@ -13,9 +13,15 @@ public partial class VaccinationHistory
 
     public int VaccineId { get; set; }
 
-    public int ChildId { get; set; }
+    public int? PatientId { get; set; }
 
-    public int FacilityId { get; set; }
+    public int? ConfigId { get; set; }
 
-    public virtual Child Child { get; set; } = null!;
+    public string? Notes { get; set; }
+
+    public virtual Configuration? Config { get; set; }
+
+    public virtual Patient? Patient { get; set; }
+
+    public virtual Vaccination Vaccine { get; set; } = null!;
 }

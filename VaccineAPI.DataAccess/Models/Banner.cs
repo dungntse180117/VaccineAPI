@@ -7,9 +7,7 @@ public partial class Banner
 {
     public int BannerId { get; set; }
 
-    public string? BannerName { get; set; }
-
-    public string? BannerImage { get; set; }
+    public string BannerName { get; set; } = null!;
 
     public int? AccountId { get; set; }
 

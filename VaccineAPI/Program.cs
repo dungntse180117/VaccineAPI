@@ -17,12 +17,16 @@ using VaccineAPI.Authorization;
 using VaccineAPI.BusinessLogic.Implement;
 using VaccineAPI.BusinessLogic.Interface;
 using VaccineAPI.DataAccess.Models;
-using IVaccineOrderService = VaccineAPI.BusinessLogic.Implement.IVaccineOrderService;
+using VaccineAPI.BusinessLogic.Services;
+using VaccinationService = VaccineAPI.BusinessLogic.Services.Implement.VaccinationService;
+using VaccineAPI.Shared.Helpers.Photo;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+<<<<<<< HEAD
 builder.Services.AddScoped<IVaccineOrderService, VaccineOrderService>(); // Register IVaccineOrderService
 builder.Services.AddScoped<IChildService, ChildService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
@@ -31,6 +35,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+=======
+>>>>>>> c0ae67172736628d05eca0002eb6e8ff78dd46cc
 
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
@@ -83,10 +89,20 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Add services
+builder.Services.Configure<CloundSettings>(builder.Configuration.GetSection(nameof(CloundSettings)));
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-
+builder.Services.AddScoped<IDiseaseService, DiseaseService>();
+builder.Services.AddScoped<IVaccinationService, VaccinationService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<ICloudService, CloudService>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

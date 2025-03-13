@@ -9,13 +9,15 @@ public partial class Feedback
 
     public int? AppointmentId { get; set; }
 
-    public int? ServiceId { get; set; }
+    public int? AccountId { get; set; }
 
     public string? Comment { get; set; }
 
+    public int? Rating { get; set; }
+
     public DateOnly? FeedbackDate { get; set; }
 
-    public virtual VaccinationAppointment? Appointment { get; set; }
+    public virtual Account? Account { get; set; }
 
-    public virtual VaccinationService? Service { get; set; }
+    public virtual VaccinationAppointment? Appointment { get; set; }
 }

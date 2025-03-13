@@ -3,19 +3,15 @@ using System.Collections.Generic;
 
 namespace VaccineAPI.DataAccess.Models;
 
-public partial class Child
+public partial class Configuration
 {
-    public int ChildId { get; set; }
+    public int ConfigId { get; set; }
 
-    public DateOnly Dob { get; set; }
+    public string FacilityName { get; set; } = null!;
 
-    public string? ChildName { get; set; }
+    public string? Address { get; set; }
 
-    public string? Gender { get; set; }
-
-    public string? VaccinationStatus { get; set; }
-
-    public virtual ICollection<Account> Accounts { get; set; } = new List<Account>();
+    public string? Phone { get; set; }
 
     public virtual ICollection<VaccinationAppointment> VaccinationAppointments { get; set; } = new List<VaccinationAppointment>();
 
