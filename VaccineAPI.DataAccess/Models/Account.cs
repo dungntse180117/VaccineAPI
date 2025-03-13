@@ -29,11 +29,11 @@ public partial class Account
 
     public virtual ICollection<ParentChild> ParentChildren { get; set; } = new List<ParentChild>();
 
+    public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
+
     public virtual Role Role { get; set; } = null!;
 
     public virtual ICollection<TrafficLog> TrafficLogs { get; set; } = new List<TrafficLog>();
-
-    public virtual ICollection<VaccinationAppointment> VaccinationAppointments { get; set; } = new List<VaccinationAppointment>();
 
     public virtual ICollection<VaccinationImage> VaccinationImages { get; set; } = new List<VaccinationImage>();
 }
