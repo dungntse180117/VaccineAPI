@@ -23,7 +23,11 @@ public partial class Patient
 
     public virtual ICollection<ParentChild> ParentChildren { get; set; } = new List<ParentChild>();
 
-    public virtual ICollection<VaccinationAppointment> VaccinationAppointments { get; set; } = new List<VaccinationAppointment>();
+    public virtual ICollection<RegistrationDetail> RegistrationDetails { get; set; } = new List<RegistrationDetail>();
+
+    public virtual ICollection<RegistrationPatient> RegistrationPatients { get; set; } = new List<RegistrationPatient>();
 
     public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
+
+    public virtual ICollection<VisitDayChangeRequest> VisitDayChangeRequests { get; set; } = new List<VisitDayChangeRequest>();
 }

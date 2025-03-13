@@ -7,7 +7,7 @@ public partial class Payment
 {
     public int PaymentId { get; set; }
 
-    public int AppointmentId { get; set; }
+    public int RegistrationId { get; set; }
 
     public decimal Amount { get; set; }
 
@@ -17,5 +17,5 @@ public partial class Payment
 
     public string? PaymentMethod { get; set; }
 
-    public virtual VaccinationAppointment Appointment { get; set; } = null!;
+    public virtual Registration Registration { get; set; } = null!;
 }

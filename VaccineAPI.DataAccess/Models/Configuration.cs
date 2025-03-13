@@ -13,7 +13,5 @@ public partial class Configuration
 
     public string? Phone { get; set; }
 
-    public virtual ICollection<VaccinationAppointment> VaccinationAppointments { get; set; } = new List<VaccinationAppointment>();
-
-    public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
+    public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 }
