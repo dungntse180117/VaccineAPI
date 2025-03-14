@@ -35,6 +35,12 @@ namespace VaccineAPI.Controllers
                 return BadRequest("Registration not found.");
             }
 
+            // Nếu trạng thái đã là "Paid" thì không tạo lại thanh toán nữa
+            if (registration.Status == "Paid")
+            {
+                return BadRequest("Payment already completed.");
+            }
+
             var model = new VnPaymentRequestModel
             {
                 OrderID = registration.RegistrationId,
