@@ -26,6 +26,9 @@ public class VisitService : IVisitService
             .Include(v => v.VisitVaccinations)
                 .ThenInclude(vv => vv.AppointmentVaccination)
                     .ThenInclude(av => av.Vaccination)
+            .Include(v => v.Appointment) 
+                .ThenInclude(a => a.RegistrationDetail) 
+                    .ThenInclude(rd => rd.Patient) 
             .FirstOrDefaultAsync(v => v.VisitId == id);
 
         if (visit == null)
@@ -49,23 +52,28 @@ public class VisitService : IVisitService
             VisitDate = visit.VisitDate,
             Notes = visit.Notes,
             Status = visit.Status,
-            VisitVaccinations = visitVaccinations // Gán danh sách vaccine
+            VisitVaccinations = visitVaccinations, 
+            PatientName = visit.Appointment.RegistrationDetail.Patient.PatientName, 
+            PatientPhone = visit.Appointment.RegistrationDetail.Patient.Phone 
         };
     }
-
     public async Task<IEnumerable<VisitResponse>> GetVisitsAsync()
     {
         return await _context.Visits
+            .Include(v => v.Appointment) 
+                .ThenInclude(a => a.RegistrationDetail) 
+                    .ThenInclude(rd => rd.Patient) 
           .Select(v => new VisitResponse
           {
               VisitID = v.VisitId,
               AppointmentID = v.AppointmentId,
               VisitDate = v.VisitDate,
               Notes = v.Notes,
-              Status = v.Status
+              Status = v.Status,
+              PatientName = v.Appointment.RegistrationDetail.Patient.PatientName, 
+              PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone 
           }).ToListAsync();
     }
-
     public async Task<VisitResponse> CreateVisitAsync(CreateVisitRequest request)
     {
         using var transaction = _context.Database.BeginTransaction();

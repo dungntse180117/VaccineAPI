@@ -16,5 +16,8 @@ namespace VaccineAPI.Shared.Response
         public string Status { get; set; }
 
         public List<VisitVaccinationInfo> VisitVaccinations { get; set; }
+
+        public string PatientName { get; set; }
+        public string PatientPhone { get; set; }
     }
 }

@@ -142,7 +142,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                         DosesScheduled = (int)vaccine.TotalDoses,
                         VaccinationName = vaccine.VaccinationName
                     };
-
+                    registrationDetail.Status = "Đã tạo lịch tổng quát";
                     _context.AppointmentVaccinations.Add(appointmentVaccination);
                 }
             }
