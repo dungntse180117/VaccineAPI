@@ -330,4 +330,23 @@ public class VisitService : IVisitService
             })
             .ToListAsync();
     }
+    public async Task<IEnumerable<VisitResponse>> GetVisitsByPatientIdAsync(int patientId)
+    {
+        return await _context.Visits
+            .Include(v => v.Appointment)
+                .ThenInclude(a => a.RegistrationDetail)
+                    .ThenInclude(rd => rd.Patient)
+            .Where(v => v.Appointment.RegistrationDetail.PatientId == patientId) 
+            .Select(v => new VisitResponse
+            {
+                VisitID = v.VisitId,
+                AppointmentID = v.AppointmentId,
+                VisitDate = v.VisitDate,
+                Notes = v.Notes,
+                Status = v.Status,
+                PatientName = v.Appointment.RegistrationDetail.Patient.PatientName, 
+                PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone 
+            }).ToListAsync();
+    }
+
 }
