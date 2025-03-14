@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace VaccineAPI.Shared.Request
+{
+    public class UpdatePatientRequest
+    {
+        public DateOnly? Dob { get; set; }
+        public string? PatientName { get; set; }
+        public string? Gender { get; set; }
+        public string? GuardianPhone { get; set; }
+        public string? Address { get; set; }
+        public string? RelationshipToAccount { get; set; }
+        public string? Phone { get; set; }
+    }
+}

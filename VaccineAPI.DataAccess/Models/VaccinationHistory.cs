@@ -5,17 +5,25 @@ namespace VaccineAPI.DataAccess.Models;
 
 public partial class VaccinationHistory
 {
-    public int VaccinationId { get; set; }
+    public int VaccinationHistoryId { get; set; }
 
-    public DateOnly VaccinationDate { get; set; }
+    public int VisitId { get; set; }
+
+    public DateTime VaccinationDate { get; set; }
 
     public string? Reaction { get; set; }
 
     public int VaccineId { get; set; }
 
-    public int ChildId { get; set; }
+    public string? Notes { get; set; }
 
-    public int FacilityId { get; set; }
+    public int? PatientId { get; set; }
 
-    public virtual Child Child { get; set; } = null!;
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+
+    public virtual Patient? Patient { get; set; }
+
+    public virtual Vaccination Vaccine { get; set; } = null!;
+
+    public virtual Visit Visit { get; set; } = null!;
 }

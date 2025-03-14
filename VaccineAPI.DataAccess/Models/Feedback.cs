@@ -7,15 +7,17 @@ public partial class Feedback
 {
     public int FeedbackId { get; set; }
 
-    public int? AppointmentId { get; set; }
+    public int? VaccinationHistoryId { get; set; }
 
-    public int? ServiceId { get; set; }
+    public int? AccountId { get; set; }
 
     public string? Comment { get; set; }
 
-    public DateOnly? FeedbackDate { get; set; }
+    public int? Rating { get; set; }
 
-    public virtual VaccinationAppointment? Appointment { get; set; }
+    public DateTime? FeedbackDate { get; set; }
 
-    public virtual VaccinationService? Service { get; set; }
+    public virtual Account? Account { get; set; }
+
+    public virtual VaccinationHistory? VaccinationHistory { get; set; }
 }
