@@ -178,11 +178,50 @@ public class VisitService : IVisitService
 
     public async Task DeleteVisitAsync(int id)
     {
-        var visit = await _context.Visits.FindAsync(id);
-        if (visit == null) throw new Exception("Không tìm thấy Visit");
+        using var transaction = _context.Database.BeginTransaction();
+        try
+        {
+            var visit = await _context.Visits
+                .Include(v => v.VisitVaccinations) 
+                .Include(v => v.Appointment) 
+                .FirstOrDefaultAsync(v => v.VisitId == id);
 
-        _context.Visits.Remove(visit);
-        await _context.SaveChangesAsync();
+            if (visit == null) throw new Exception("Không tìm thấy Visit");
+
+           
+
+
+         
+            
+            foreach (var visitVaccination in visit.VisitVaccinations)
+            {
+                var appointmentVaccination = visitVaccination.AppointmentVaccination;
+                if (appointmentVaccination != null)
+                {
+                    appointmentVaccination.DosesScheduled++;
+                }
+            }
+            
+            if (visit.VisitVaccinations != null && visit.VisitVaccinations.Any())
+            {
+                _context.VisitVaccinations.RemoveRange(visit.VisitVaccinations);
+            }
+
+            if (visit.Appointment != null && visit.Appointment.Status == "Lên lịch hoàn tất")
+            {
+                visit.Appointment.Status = "Đang lên lịch";
+            }
+
+            _context.Visits.Remove(visit);
+            await _context.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            throw; 
+        }
     }
 
     public async Task<IActionResult> UpdateVisitStatusAsync(int id, UpdateVisitStatusRequest request)
