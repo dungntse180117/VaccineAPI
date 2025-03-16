@@ -178,11 +178,52 @@ public class VisitService : IVisitService
 
     public async Task DeleteVisitAsync(int id)
     {
-        var visit = await _context.Visits.FindAsync(id);
-        if (visit == null) throw new Exception("Không tìm thấy Visit");
+        using var transaction = _context.Database.BeginTransaction();
+        try
+        {
+            var visit = await _context.Visits
+                .Include(v => v.VisitVaccinations)
+                .ThenInclude(vv => vv.AppointmentVaccination) 
+                .Include(v => v.Appointment)
+                .FirstOrDefaultAsync(v => v.VisitId == id);
 
-        _context.Visits.Remove(visit);
-        await _context.SaveChangesAsync();
+            if (visit == null) throw new Exception("Không tìm thấy Visit");
+
+            // Duyệt qua từng VisitVaccination và cập nhật dosesScheduled
+            foreach (var visitVaccination in visit.VisitVaccinations)
+            {
+                var appointmentVaccination = visitVaccination.AppointmentVaccination;
+                if (appointmentVaccination != null)
+                {
+                    appointmentVaccination.DosesScheduled++;
+                    _context.AppointmentVaccinations.Update(appointmentVaccination); 
+                }
+            }
+    
+            await _context.SaveChangesAsync();
+
+            // Xóa các VisitVaccination liên quan
+            if (visit.VisitVaccinations != null && visit.VisitVaccinations.Any())
+            {
+                _context.VisitVaccinations.RemoveRange(visit.VisitVaccinations);
+            }
+
+            // Cập nhật trạng thái của Appointment nếu cần
+            if (visit.Appointment != null && visit.Appointment.Status == "Lên lịch hoàn tất")
+            {
+                visit.Appointment.Status = "Đang lên lịch";
+                _context.Appointments.Update(visit.Appointment);
+            }
+
+            _context.Visits.Remove(visit);
+            await _context.SaveChangesAsync();
+            transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
     public async Task<IActionResult> UpdateVisitStatusAsync(int id, UpdateVisitStatusRequest request)
@@ -291,4 +332,23 @@ public class VisitService : IVisitService
             })
             .ToListAsync();
     }
+    public async Task<IEnumerable<VisitResponse>> GetVisitsByPatientIdAsync(int patientId)
+    {
+        return await _context.Visits
+            .Include(v => v.Appointment)
+                .ThenInclude(a => a.RegistrationDetail)
+                    .ThenInclude(rd => rd.Patient)
+            .Where(v => v.Appointment.RegistrationDetail.PatientId == patientId) 
+            .Select(v => new VisitResponse
+            {
+                VisitID = v.VisitId,
+                AppointmentID = v.AppointmentId,
+                VisitDate = v.VisitDate,
+                Notes = v.Notes,
+                Status = v.Status,
+                PatientName = v.Appointment.RegistrationDetail.Patient.PatientName, 
+                PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone 
+            }).ToListAsync();
+    }
+
 }

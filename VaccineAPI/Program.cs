@@ -26,7 +26,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+<<<<<<< HEAD
 
+=======
+
+
+builder.Services.AddScoped<IImageService, ImageService>();
+
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
+builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+
+>>>>>>> 06a0bca36ba59f729351117ac67bcaede91071b6
 
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>

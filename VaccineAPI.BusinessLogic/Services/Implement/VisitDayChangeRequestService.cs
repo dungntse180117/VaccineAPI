@@ -76,10 +76,10 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             var changeRequest = new VisitDayChangeRequest
             {
                 VisitId = request.VisitID,
-                PatientId = visit.Appointment.RegistrationDetail.PatientId.Value, //Gán PatientId từ Visit
+                PatientId = visit.Appointment.RegistrationDetail.PatientId.Value, 
                 RequestedDate = request.RequestedDate,
                 Reason = request.Reason,
-                Status = "Pending", // Trạng thái mặc định
+                Status = "Pending",
                 RequestedDateAt = DateTime.Now
             };
 
