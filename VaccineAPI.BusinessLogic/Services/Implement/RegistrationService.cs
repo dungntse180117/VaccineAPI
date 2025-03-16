@@ -42,6 +42,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
 
                 // 2. Tính totalAmount
                 decimal totalAmount = 0;
+                List<int> vaccinationIdsToCheck = new List<int>();
                 if (request.ServiceId.HasValue && request.ServiceId > 0)
                 {
                     var service = await _context.VaccinationServices.FindAsync(request.ServiceId);
@@ -61,9 +62,38 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                             throw new ArgumentException($"Không tìm thấy vắc xin với ID = {vaccinationId}");
                         }
                         totalAmount += (decimal)vaccination.Price * request.PatientIds.Count; //Giá vaccine * số lượng bệnh nhân
+                        vaccinationIdsToCheck.AddRange(request.VaccinationIds);
                     }
                 }
+                foreach (var patientId in request.PatientIds)
+                {
+                    var patient = await _context.Patients.FindAsync(patientId);
+                    if (patient == null)
+                    {
+                        throw new ArgumentException($"Không tìm thấy bệnh nhân với ID = {patientId}");
+                    }
 
+                    foreach (var vaccinationId in vaccinationIdsToCheck)
+                    {
+                        var vaccination = await _context.Vaccinations.FindAsync(vaccinationId);
+                        if (vaccination == null)
+                        {
+                            throw new ArgumentException($"Không tìm thấy vắc xin với ID = {vaccinationId}");
+                        }
+
+                        // Tính tuổi của bệnh nhân bằng NGÀY
+                        int patientAgeInDays = CalculateAgeInDays(patient.Dob);
+
+                        // Tính tuổi tối thiểu của vắc xin bằng NGÀY
+                        int minAgeInDays = CalculateVaccinationAgeInDays((int)vaccination.MinAge, (int)vaccination.AgeUnitId);
+
+                        // Kiểm tra tuổi tối thiểu
+                        if (patientAgeInDays < minAgeInDays)
+                        {
+                            throw new ArgumentException($"Tuổi của bệnh nhân {patient.PatientName} không đủ tuổi để tiêm vắc xin {vaccination.VaccinationName}.");
+                        }       
+                    }
+                }
                 // 3. Tạo Registration
                 var registration = new Registration
                 {
@@ -125,9 +155,32 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 throw;
             }
         }
+        private int CalculateAgeInDays(DateOnly dob)
+        {
+            DateOnly now = DateOnly.FromDateTime(DateTime.Today);
+            return (int)(now.DayNumber - dob.DayNumber);
+        }
 
-      
-
+        private int CalculateVaccinationAgeInDays(int age, int ageUnitId)
+        {
+            if (ageUnitId == 1) // Ngày
+            {
+                return age;
+            }
+            else if (ageUnitId == 2) // Tháng
+            {
+                return (int)(age * 30.44);
+            }
+            else if (ageUnitId == 3) // Năm
+            {
+                return (int)(age * 365.25);
+            }
+            else
+            {
+                throw new ArgumentException("Invalid AgeUnitId: " + ageUnitId);
+            }
+        }
+    
         public async Task<RegistrationResponse?> GetRegistrationAsync(int id)
         {
             try

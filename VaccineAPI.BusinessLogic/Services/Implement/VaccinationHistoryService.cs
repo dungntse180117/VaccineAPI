@@ -60,12 +60,8 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             try
             {
                 var history = await _context.VaccinationHistories.FindAsync(id);
-                if (history == null) return new NotFoundResult();
-
-                history.VaccinationDate = request.VaccinationDate;
+                if (history == null) return new NotFoundResult();        
                 history.Reaction = request.Reaction;
-                history.Notes = request.Notes;
-
                 await _context.SaveChangesAsync();
                 transaction.Commit();
                 return new OkResult();

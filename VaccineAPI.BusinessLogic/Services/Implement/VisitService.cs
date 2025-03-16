@@ -182,45 +182,47 @@ public class VisitService : IVisitService
         try
         {
             var visit = await _context.Visits
-                .Include(v => v.VisitVaccinations) 
-                .Include(v => v.Appointment) 
+                .Include(v => v.VisitVaccinations)
+                .ThenInclude(vv => vv.AppointmentVaccination) 
+                .Include(v => v.Appointment)
                 .FirstOrDefaultAsync(v => v.VisitId == id);
 
             if (visit == null) throw new Exception("Không tìm thấy Visit");
 
-           
-
-
-         
-            
+            // Duyệt qua từng VisitVaccination và cập nhật dosesScheduled
             foreach (var visitVaccination in visit.VisitVaccinations)
             {
                 var appointmentVaccination = visitVaccination.AppointmentVaccination;
                 if (appointmentVaccination != null)
                 {
                     appointmentVaccination.DosesScheduled++;
+                    _context.AppointmentVaccinations.Update(appointmentVaccination); 
                 }
             }
-            
+    
+            await _context.SaveChangesAsync();
+
+            // Xóa các VisitVaccination liên quan
             if (visit.VisitVaccinations != null && visit.VisitVaccinations.Any())
             {
                 _context.VisitVaccinations.RemoveRange(visit.VisitVaccinations);
             }
 
+            // Cập nhật trạng thái của Appointment nếu cần
             if (visit.Appointment != null && visit.Appointment.Status == "Lên lịch hoàn tất")
             {
                 visit.Appointment.Status = "Đang lên lịch";
+                _context.Appointments.Update(visit.Appointment);
             }
 
             _context.Visits.Remove(visit);
             await _context.SaveChangesAsync();
-
             transaction.Commit();
         }
         catch (Exception ex)
         {
             transaction.Rollback();
-            throw; 
+            throw;
         }
     }
 
