@@ -97,4 +97,11 @@ public class VisitController : ControllerBase
         var visits = await _visitService.GetVisitsByAppointmentIdAsync(appointmentId);
         return Ok(visits);
     }
+
+    [HttpGet("patient/{patientId}")] 
+    public async Task<ActionResult<IEnumerable<VisitResponse>>> GetVisitsByPatientId(int patientId)
+    {
+        var visits = await _visitService.GetVisitsByPatientIdAsync(patientId);
+        return Ok(visits);
+    }
 }

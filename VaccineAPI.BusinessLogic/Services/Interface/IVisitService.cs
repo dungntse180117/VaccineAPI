@@ -18,6 +18,7 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
         Task DeleteVisitAsync(int id);
         Task<IActionResult> UpdateVisitStatusAsync(int id, UpdateVisitStatusRequest request);
         Task<IEnumerable<VisitResponse>> GetVisitsByAppointmentIdAsync(int appointmentId);
+        Task<IEnumerable<VisitResponse>> GetVisitsByPatientIdAsync(int patientId);
 
     }
 }
