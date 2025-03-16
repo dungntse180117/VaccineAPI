@@ -20,23 +20,14 @@ using VaccineAPI.DataAccess.Models;
 using VaccineAPI.BusinessLogic.Services;
 using VaccinationService = VaccineAPI.BusinessLogic.Services.Implement.VaccinationService;
 using VaccineAPI.Shared.Helpers.Photo;
+using VaccineAPI.BusinessLogic.Services.Interface.VaccineAPI.BusinessLogic.Services.Interface;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-<<<<<<< HEAD
 
-=======
-
-
-builder.Services.AddScoped<IImageService, ImageService>();
-
-builder.Services.AddSingleton<IVnPayService, VnPayService>();
-builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
-
->>>>>>> 06a0bca36ba59f729351117ac67bcaede91071b6
 
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
@@ -105,6 +96,7 @@ builder.Services.AddScoped<IVisitService, VisitService>();
 builder.Services.AddScoped<IVisitDayChangeRequestService, VisitDayChangeRequestService>();
 builder.Services.AddScoped<IVaccinationHistoryService, VaccinationHistoryService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
