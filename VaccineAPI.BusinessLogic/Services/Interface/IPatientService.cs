@@ -16,5 +16,6 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
         Task<PatientResponse?> UpdatePatientAsync(int id, UpdatePatientRequest request);
         Task<bool> DeletePatientAsync(int id);
         Task<List<PatientResponse>> GetAllPatientsByAccountIdAsync(int accountId);
+        Task<List<PatientResponse>> GetPatientsByPhoneAsync(string phone);
     }
 }

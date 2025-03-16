@@ -96,5 +96,23 @@ namespace VaccineAPI.Controllers
 
             return NoContent(); // Trả về 204 No Content nếu xóa thành công
         }
+        [HttpGet("byphone/{phone}")]
+        public async Task<IActionResult> GetPatientsByPhone(string phone)
+        {
+            try
+            {
+                var patients = await _patientService.GetPatientsByPhoneAsync(phone);
+                if (patients == null || patients.Count == 0)
+                {
+                    return NotFound("No patients found with the provided phone number.");
+                }
+                return Ok(patients);
+            }
+            catch (Exception ex)
+            {
+             
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
+            }
+        }
     }
 }

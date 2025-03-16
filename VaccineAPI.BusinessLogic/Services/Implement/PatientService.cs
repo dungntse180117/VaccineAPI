@@ -255,5 +255,33 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 throw;
             }
         }
+        public async Task<List<PatientResponse>> GetPatientsByPhoneAsync(string phone)
+        {
+            try
+            {
+                var patients = await _context.Patients
+                .Where(p => p.Phone == phone)
+                .Select(patient => new PatientResponse
+                {
+                    PatientId = patient.PatientId,
+                    Dob = patient.Dob,
+                    PatientName = patient.PatientName,
+                    Gender = patient.Gender,
+                    GuardianPhone = patient.GuardianPhone,
+                    Address = patient.Address,
+                    RelationshipToAccount = patient.RelationshipToAccount,
+                    Phone = patient.Phone
+
+                }).ToListAsync();
+
+                return patients;
+            }
+            catch (Exception e)
+            {
+
+                _logger.LogError(e, "GetPatientsByPhoneAsync error with phone: {phone}", phone);
+                throw;
+            }
+        }
     }
-    }
+}
