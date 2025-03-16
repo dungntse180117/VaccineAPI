@@ -19,125 +19,104 @@ namespace VaccineAPI.Controllers
         private readonly IVnPayService _vnPayService;
         private readonly VaccinationTrackingContext _context;
         private readonly ILogger<VnPayController> _logger;
-
-        public VnPayController(IVnPayService vnPayService, VaccinationTrackingContext context, ILogger<VnPayController> logger)
+        private readonly IRegistrationService _registrationService;
+        public VnPayController(IVnPayService vnPayService, VaccinationTrackingContext context, ILogger<VnPayController> logger, IRegistrationService registrationService)
         {
             _vnPayService = vnPayService;
             _context = context;
             _logger = logger;
+            _registrationService = registrationService;
         }
 
         [HttpPost("CreatePayment")]
-        public async Task<IActionResult> CreatePayment(int registrationId)
-        {
-            var registration = await _context.Registrations.FindAsync(registrationId);
-            if (registration == null)
-            {
-                return BadRequest("Registration not found.");
-            }
-
-            // Nếu trạng thái đã là "Paid" thì không tạo lại thanh toán nữa
-            if (registration.Status == "Paid")
-            {
-                return BadRequest("Payment already completed.");
-            }
-
-            var model = new VnPaymentRequestModel
-            {
-                OrderID = registration.RegistrationId,
-                FullName = "Anonymous", // Update if you want to use account details
-                Description = "Thanh toán đăng ký tiêm chủng",
-                Amount = (double)registration.TotalAmount,
-                CreatedDate = DateTime.Now
-            };
-
-            var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
-
-            return Ok(new { paymentUrl });
-        }
-
-        [HttpGet("PaymentExecute")]
-        public async Task<IActionResult> PaymentExecute([FromServices] IRegistrationService registrationService)
+        public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
         {
             try
             {
-                var vnpAmount = Request.Query["vnp_Amount"];
+                var registration = await _context.Registrations.FindAsync(request.RegistrationId);
+                if (registration == null)
+                {
+                    return BadRequest("Registration not found.");
+                }
+
+                if (registration.Status == "Paid")
+                {
+                    return BadRequest("Payment already completed.");
+                }
+
+                var model = new VnPaymentRequestModel
+                {
+                    OrderID = registration.RegistrationId,
+                    FullName = "Anonymous",
+                    Description = "Thanh toán đăng ký tiêm chủng",
+                    Amount = (double)registration.TotalAmount,
+                    CreatedDate = DateTime.Now
+                };
+
+                var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
+                return Ok(new { paymentUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while creating the payment.");
+            }
+        }
+
+
+        [HttpGet("PaymentExecute")]
+        public async Task<IActionResult> PaymentExecute()
+        {
+            try
+            {
                 var vnpResponseCode = Request.Query["vnp_ResponseCode"];
-                var vnpCardType = Request.Query["vnp_CardType"];
-                var vnpOrderInfo = Request.Query["vnp_OrderInfo"];
-                var vnpTransactionNo = Request.Query["vnp_TransactionNo"];
-                var vnpBankTranNo = Request.Query["vnp_BankTranNo"];
                 var vnpTxnRef = Request.Query["vnp_TxnRef"];
+                var vnpAmount = Request.Query["vnp_Amount"];
 
                 if (string.IsNullOrEmpty(vnpTxnRef))
                 {
-                    _logger.LogError("vnp_TxnRef is missing.");
                     return BadRequest("vnp_TxnRef is required.");
                 }
 
-                var response = new VnPaymentResponseModel
+                
+                if (vnpResponseCode == "00") 
                 {
-                    Success = vnpResponseCode == "00",
-                    PaymentMethod = vnpCardType,
-                    OrderDescription = vnpOrderInfo,
-                    OrderId = vnpTxnRef,
-                    PaymentId = vnpTransactionNo,
-                    TransactionId = vnpBankTranNo,
-                    VnPayResponseCode = vnpResponseCode,
-                    Amount = double.Parse(vnpAmount) / 100,  // Convert từ cents sang VND
-                    Message = vnpResponseCode == "00" ? "Payment Successful" : "Payment Failed"
-                };
-
-                if (response.Success)
-                {
-                    var orderParts = response.OrderId.Split('_');
-                    if (!int.TryParse(orderParts[0], out int orderId))
+                    // Phân tách vnpTxnRef bằng dấu gạch dưới
+                    var orderParts = vnpTxnRef.ToString().Split('_'); 
+                    if (!int.TryParse(orderParts[0], out int orderId)) 
                     {
-                        _logger.LogError($"Invalid OrderId format: {response.OrderId}");
                         return BadRequest("Invalid OrderId format.");
                     }
 
                     var registration = await _context.Registrations.FindAsync(orderId);
                     if (registration == null)
                     {
-                        _logger.LogError($"Registration not found with ID: {orderId}");
                         return BadRequest("Registration not found.");
                     }
+                    var updateRequest = new UpdateRegistrationStatusRequest
+                    {
+                        Status = "Paid" 
+                    };
 
-                    // Cập nhật trạng thái thành "Paid" trong database
-                    registration.Status = "Paid";
-                    registration.TotalAmount = (decimal)response.Amount;
+                    // Gọi phương thức UpdateRegistrationStatusAsync
+                    var result = await _registrationService.UpdateRegistrationStatusAsync(orderId, updateRequest);
+                    registration.TotalAmount = (decimal)(double.Parse(vnpAmount) / 100); 
                     await _context.SaveChangesAsync();
 
-                    _logger.LogInformation($"Registration {orderId} updated to Paid successfully. PaymentId: {response.PaymentId}, Amount: {response.Amount} VND.");
-
-                    // Gọi phương thức UpdateRegistrationStatusAsync từ service
-                    var updateRequest = new UpdateRegistrationStatusRequest { Status = "Confirmed" };
-                    var updateResult = await registrationService.UpdateRegistrationStatusAsync(orderId, updateRequest);
-
-                    if (updateResult is StatusCodeResult statusResult && statusResult.StatusCode == 500)
-                    {
-                        _logger.LogError("Failed to update registration status to 'Confirmed' after payment.");
-                    }
-                    else
-                    {
-                        _logger.LogInformation($"Registration {orderId} successfully updated to 'Confirmed'.");
-                    }
+                  
+                    return Redirect("http://localhost:5173/payment-success");
                 }
-                else
+                else 
                 {
-                    _logger.LogError("Payment failed: " + response.Message);
+                  
+                    return Redirect("http://localhost:5173/payment-failed");
                 }
-
-                return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred during PaymentExecute.");
+                // Ghi log lỗi
+                _logger.LogError(ex, "An error occurred during payment execution.");
                 return StatusCode(500, "An error occurred during payment execution.");
             }
         }
-
-
     }
 }

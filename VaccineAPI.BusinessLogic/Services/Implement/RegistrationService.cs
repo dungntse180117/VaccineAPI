@@ -361,7 +361,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     Status = registration.Status,
                     DesiredDate = registration.DesiredDate
                 };
-                if (request.Status == "Confirmed")
+                if (request.Status == "Paid")
                 {
                     await CreateRegistrationDetailsAsync(id);
                 }
