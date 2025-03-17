@@ -21,7 +21,9 @@ public partial class Patient
 
     public string? Phone { get; set; }
 
-    public virtual ICollection<ParentChild> ParentChildren { get; set; } = new List<ParentChild>();
+    public int AccountId { get; set; }
+
+    public virtual Account Account { get; set; } = null!;
 
     public virtual ICollection<RegistrationDetail> RegistrationDetails { get; set; } = new List<RegistrationDetail>();
 

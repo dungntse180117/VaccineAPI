@@ -23,11 +23,9 @@ public partial class Account
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Banner> Banners { get; set; } = new List<Banner>();
-
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
-    public virtual ICollection<ParentChild> ParentChildren { get; set; } = new List<ParentChild>();
+    public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
 
     public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 

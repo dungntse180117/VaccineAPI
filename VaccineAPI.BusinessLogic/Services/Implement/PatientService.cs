@@ -43,39 +43,31 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     GuardianPhone = request.GuardianPhone,
                     Address = request.Address,
                     RelationshipToAccount = request.RelationshipToAccount,
-                    Phone = request.Phone
+                    Phone = request.Phone,
+                    AccountId = request.AccountId // Thêm AccountId vào Patient
                 };
 
                 // Thêm Patient vào database
                 _context.Patients.Add(patient);
                 await _context.SaveChangesAsync();
 
-                // Tạo Parent_Child
-                var parentChild = new ParentChild
-                {
-                    AccountId = request.AccountId,
-                    PatientId = patient.PatientId
-                };
-                _context.ParentChildren.Add(parentChild);
-                await _context.SaveChangesAsync();
 
-                // Tạo PatientResponse (ánh xạ thủ công)
                 return new PatientResponse
                 {
                     PatientId = patient.PatientId,
                     Dob = patient.Dob,
                     PatientName = patient.PatientName,
                     Gender = patient.Gender,
-                    GuardianPhone = request.GuardianPhone,
-                    Address = request.Address,
-                    RelationshipToAccount = request.RelationshipToAccount,
+                    GuardianPhone = patient.GuardianPhone,  // Corrected typo here
+                    Address = patient.Address,
+                    RelationshipToAccount = patient.RelationshipToAccount,
                     Phone = patient.Phone
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi khi tạo Patient."); // Ghi log
-                throw; // Ném exception để controller xử lý
+                throw; 
             }
         }
 
@@ -130,17 +122,18 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi GetAllPatientsAsync"); 
+                _logger.LogError(ex, "Lỗi khi GetAllPatientsAsync");
                 throw;
             }
         }
+
         public async Task<List<PatientResponse>> GetAllPatientsByAccountIdAsync(int accountId)
         {
             try
             {
-                var patients = await _context.ParentChildren
-                       .Where(pc => pc.AccountId == accountId)
-                       .Select(pc => pc.Patient)
+                // Sử dụng quan hệ trực tiếp, không cần qua ParentChildren
+                var patients = await _context.Patients
+                       .Where(p => p.AccountId == accountId)
                        .ToListAsync();
 
                 return patients.Select(patient => new PatientResponse
@@ -161,6 +154,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 throw;
             }
         }
+
         public async Task<PatientResponse?> UpdatePatientAsync(int id, UpdatePatientRequest request)
         {
             try
@@ -172,7 +166,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     return null;
                 }
 
-               
+
                 if (request.Dob.HasValue)
                 {
                     patient.Dob = request.Dob.Value;
@@ -204,22 +198,22 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
 
                 await _context.SaveChangesAsync();
 
-               
+
                 return new PatientResponse
                 {
                     PatientId = patient.PatientId,
                     Dob = patient.Dob,
                     PatientName = patient.PatientName,
                     Gender = patient.Gender,
-                    GuardianPhone = request.GuardianPhone,
+                    GuardianPhone = patient.GuardianPhone, 
                     Address = patient.Address,
-                    RelationshipToAccount = request.RelationshipToAccount,
+                    RelationshipToAccount = patient.RelationshipToAccount,
                     Phone = patient.Phone
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi UpdatePatientAsync with ID: {id}.", id); 
+                _logger.LogError(ex, "Lỗi khi UpdatePatientAsync with ID: {id}.", id);
                 throw;
             }
         }
@@ -234,16 +228,6 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 {
                     return false;
                 }
-
-               
-                var parentChildren = await _context.ParentChildren
-                    .Where(pc => pc.PatientId == id)
-                    .ToListAsync();
-
-                _context.ParentChildren.RemoveRange(parentChildren);
-                await _context.SaveChangesAsync();
-
-               
                 _context.Patients.Remove(patient);
                 await _context.SaveChangesAsync();
 
@@ -251,10 +235,11 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi DeletePatientAsync with ID: {id}.", id); 
+                _logger.LogError(ex, "Lỗi khi DeletePatientAsync with ID: {id}.", id);
                 throw;
             }
         }
+
         public async Task<List<PatientResponse>> GetPatientsByPhoneAsync(string phone)
         {
             try
