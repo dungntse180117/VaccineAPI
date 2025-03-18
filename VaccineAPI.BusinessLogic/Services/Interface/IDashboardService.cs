@@ -13,8 +13,8 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
     {
         public interface IDashboardService
         {
-            Task<Dictionary<int, decimal>> GetRevenuePerMonthAsync(int year);
-            Task<Dictionary<int, int>> GetVisitsPerMonthAsync(int year);
+            Task<Dictionary<int, decimal>> GetRevenuePerMonthAsync(int month);
+            Task<Dictionary<int, int>> GetVisitsPerMonthAsync(int month);
             Task<string> GetMostPurchasedVaccineAsync();
             Task<string> GetMostPurchasedPackageAsync();
         }

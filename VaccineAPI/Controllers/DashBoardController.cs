@@ -17,16 +17,16 @@ namespace VaccineAPI.Controllers
         }
 
         [HttpGet("RevenuePerMonth")]
-        public async Task<IActionResult> GetRevenuePerMonth(int year)
+        public async Task<IActionResult> GetRevenuePerMonth(int month)
         {
-            var result = await _dashboardService.GetRevenuePerMonthAsync(year);
+            var result = await _dashboardService.GetRevenuePerMonthAsync(month);
             return Ok(result);
         }
 
         [HttpGet("VisitsPerMonth")]
-        public async Task<IActionResult> GetVisitsPerMonth(int year)
+        public async Task<IActionResult> GetVisitsPerMonth(int month)
         {
-            var result = await _dashboardService.GetVisitsPerMonthAsync(year);
+            var result = await _dashboardService.GetVisitsPerMonthAsync(month);
             return Ok(result);
         }
 
