@@ -19,19 +19,19 @@ namespace VaccineAPI.BusinessLogic.Services
             _context = context;
         }
 
-        public async Task<Dictionary<int, decimal>> GetRevenuePerMonthAsync(int year)
+        public async Task<Dictionary<int, decimal>> GetRevenuePerMonthAsync(int month)
         {
             return await _context.Registrations
-                .Where(r => r.Status == "Paid" && r.RegistrationDate.HasValue && r.RegistrationDate.Value.Year == year)
+                .Where(r => r.Status == "Confirmed" && r.RegistrationDate.HasValue && r.RegistrationDate.Value.Month == month)
                 .GroupBy(r => r.RegistrationDate!.Value.Month)
                 .Select(g => new { Month = g.Key, TotalAmount = g.Sum(r => r.TotalAmount) })
                 .ToDictionaryAsync(x => x.Month, x => x.TotalAmount);
         }
 
-        public async Task<Dictionary<int, int>> GetVisitsPerMonthAsync(int year)
+        public async Task<Dictionary<int, int>> GetVisitsPerMonthAsync(int month)
         {
             return await _context.Visits
-                .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Year == year)
+                .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Month == month)
                 .GroupBy(v => v.VisitDate.Value.Month)
                 .Select(g => new { Month = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Month, x => x.Count);

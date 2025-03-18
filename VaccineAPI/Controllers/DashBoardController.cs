@@ -15,19 +15,48 @@ namespace VaccineAPI.Controllers
             _dashboardService = dashboardService;
             _logger = logger;
         }
-
         [HttpGet("RevenuePerMonth")]
-        public async Task<IActionResult> GetRevenuePerMonth(int year)
+        public async Task<IActionResult> GetRevenuePerMonth(int month)
         {
-            var result = await _dashboardService.GetRevenuePerMonthAsync(year);
-            return Ok(result);
+            try
+            {
+                if (month < 1 || month > 12)
+                {
+                    return BadRequest("Invalid month value. It should be between 1 and 12.");
+                }
+
+                var result = await _dashboardService.GetRevenuePerMonthAsync(month);
+                _logger.LogInformation("Retrieved revenue for month {Month}.", month);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving revenue for month {Month}.", month);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
         [HttpGet("VisitsPerMonth")]
-        public async Task<IActionResult> GetVisitsPerMonth(int year)
+        public async Task<IActionResult> GetVisitsPerMonth(int month)
         {
-            var result = await _dashboardService.GetVisitsPerMonthAsync(year);
-            return Ok(result);
+            try
+            {
+                if (month < 1 || month > 12)
+                {
+                    return BadRequest("Invalid month value. It should be between 1 and 12.");
+                }
+
+                var result = await _dashboardService.GetVisitsPerMonthAsync(month);
+                _logger.LogInformation("Retrieved visits for month {Month}.", month);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving visits for month {Month}.", month);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
         [HttpGet("MostPurchasedVaccine")]
