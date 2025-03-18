@@ -10,14 +10,21 @@ using VaccineAPI.DataAccess.Data;
 using VaccineAPI.DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using VaccineAPI.BusinessLogic.Services.Implement;
+using Microsoft.Extensions.Configuration;
 
 public class VisitService : IVisitService
 {
     private readonly VaccinationTrackingContext _context;
-    private readonly ILogger _logger;
-    public VisitService(VaccinationTrackingContext context)
+    private readonly ILogger<VisitService> _logger;
+    private readonly IEmailSender _emailSender; 
+    private readonly IConfiguration _configuration;
+    public VisitService(VaccinationTrackingContext context, ILogger<VisitService> logger, IEmailSender emailSender, IConfiguration configuration) 
     {
         _context = context;
+        _logger = logger;
+        _emailSender = emailSender; 
+        _configuration = configuration; 
     }
 
     public async Task<VisitResponse> GetVisitAsync(int id)
@@ -26,9 +33,9 @@ public class VisitService : IVisitService
             .Include(v => v.VisitVaccinations)
                 .ThenInclude(vv => vv.AppointmentVaccination)
                     .ThenInclude(av => av.Vaccination)
-            .Include(v => v.Appointment) 
-                .ThenInclude(a => a.RegistrationDetail) 
-                    .ThenInclude(rd => rd.Patient) 
+            .Include(v => v.Appointment)
+                .ThenInclude(a => a.RegistrationDetail)
+                    .ThenInclude(rd => rd.Patient)
             .FirstOrDefaultAsync(v => v.VisitId == id);
 
         if (visit == null)
@@ -52,17 +59,17 @@ public class VisitService : IVisitService
             VisitDate = visit.VisitDate,
             Notes = visit.Notes,
             Status = visit.Status,
-            VisitVaccinations = visitVaccinations, 
-            PatientName = visit.Appointment.RegistrationDetail.Patient.PatientName, 
-            PatientPhone = visit.Appointment.RegistrationDetail.Patient.Phone 
+            VisitVaccinations = visitVaccinations,
+            PatientName = visit.Appointment.RegistrationDetail.Patient.PatientName,
+            PatientPhone = visit.Appointment.RegistrationDetail.Patient.Phone
         };
     }
     public async Task<IEnumerable<VisitResponse>> GetVisitsAsync()
     {
         return await _context.Visits
-            .Include(v => v.Appointment) 
-                .ThenInclude(a => a.RegistrationDetail) 
-                    .ThenInclude(rd => rd.Patient) 
+            .Include(v => v.Appointment)
+                .ThenInclude(a => a.RegistrationDetail)
+                    .ThenInclude(rd => rd.Patient)
           .Select(v => new VisitResponse
           {
               VisitID = v.VisitId,
@@ -70,8 +77,8 @@ public class VisitService : IVisitService
               VisitDate = v.VisitDate,
               Notes = v.Notes,
               Status = v.Status,
-              PatientName = v.Appointment.RegistrationDetail.Patient.PatientName, 
-              PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone 
+              PatientName = v.Appointment.RegistrationDetail.Patient.PatientName,
+              PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone
           }).ToListAsync();
     }
     public async Task<VisitResponse> CreateVisitAsync(CreateVisitRequest request)
@@ -101,7 +108,7 @@ public class VisitService : IVisitService
                 AppointmentId = request.AppointmentID,
                 VisitDate = request.VisitDate,
                 Notes = request.Notes,
-                Status = "Chưa tiêm" 
+                Status = "Chưa tiêm"
             };
 
             _context.Visits.Add(visit);
@@ -132,7 +139,7 @@ public class VisitService : IVisitService
                 {
                     VisitId = visit.VisitId,
                     AppointmentVaccinationId = appointmentVaccinationId,
-                    
+
 
                 };
 
@@ -183,7 +190,7 @@ public class VisitService : IVisitService
         {
             var visit = await _context.Visits
                 .Include(v => v.VisitVaccinations)
-                .ThenInclude(vv => vv.AppointmentVaccination) 
+                .ThenInclude(vv => vv.AppointmentVaccination)
                 .Include(v => v.Appointment)
                 .FirstOrDefaultAsync(v => v.VisitId == id);
 
@@ -196,10 +203,10 @@ public class VisitService : IVisitService
                 if (appointmentVaccination != null)
                 {
                     appointmentVaccination.DosesScheduled++;
-                    _context.AppointmentVaccinations.Update(appointmentVaccination); 
+                    _context.AppointmentVaccinations.Update(appointmentVaccination);
                 }
             }
-    
+
             await _context.SaveChangesAsync();
 
             // Xóa các VisitVaccination liên quan
@@ -321,7 +328,7 @@ public class VisitService : IVisitService
                 VisitDate = v.VisitDate,
                 Notes = v.Notes,
                 Status = v.Status,
-                VisitVaccinations = v.VisitVaccinations 
+                VisitVaccinations = v.VisitVaccinations
                     .Select(vv => new VisitVaccinationInfo
                     {
                         AppointmentVaccinationID = vv.AppointmentVaccinationId,
@@ -338,7 +345,7 @@ public class VisitService : IVisitService
             .Include(v => v.Appointment)
                 .ThenInclude(a => a.RegistrationDetail)
                     .ThenInclude(rd => rd.Patient)
-            .Where(v => v.Appointment.RegistrationDetail.PatientId == patientId) 
+            .Where(v => v.Appointment.RegistrationDetail.PatientId == patientId)
             .Select(v => new VisitResponse
             {
                 VisitID = v.VisitId,
@@ -346,9 +353,118 @@ public class VisitService : IVisitService
                 VisitDate = v.VisitDate,
                 Notes = v.Notes,
                 Status = v.Status,
-                PatientName = v.Appointment.RegistrationDetail.Patient.PatientName, 
-                PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone 
+                PatientName = v.Appointment.RegistrationDetail.Patient.PatientName,
+                PatientPhone = v.Appointment.RegistrationDetail.Patient.Phone
             }).ToListAsync();
     }
+    public async Task SendVisitReminderEmailsAsync()
+    {
+        // LOGGING: Start of SendVisitReminderEmailsAsync
+        _logger.LogInformation($"SendVisitReminderEmailsAsync() started at: {DateTime.Now}");
 
+        // Get visits scheduled for today only
+        DateTime today = DateTime.Today;
+
+        var visits = await _context.Visits
+            .Include(v => v.Appointment)
+                .ThenInclude(a => a.RegistrationDetail)
+                    .ThenInclude(rd => rd.Patient)
+                        .ThenInclude(p => p.Account) // Include Account here - VERY IMPORTANT for email retrieval!
+            .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Date == today.Date && v.Status != "Đã tiêm") // Chỉ gửi nhắc nhở cho lịch ngày hôm nay
+            .ToListAsync();
+
+        // LOGGING: List of Visit IDs to process
+        _logger.LogInformation("List of Visit IDs to process:");
+        foreach (var visit in visits) // Log Visit IDs before the loop
+        {
+            _logger.LogInformation($"  Visit ID: {visit.VisitId}");
+        }
+
+        foreach (var visit in visits)
+        {
+            try
+            {
+                _logger.LogInformation($"Bắt đầu xử lý lịch hẹn ID: {visit.VisitId}");
+
+                var appointment = visit.Appointment;
+                if (appointment == null)
+                {
+                    _logger.LogError($"Lịch hẹn ID: {visit.VisitId} không có Appointment liên kết!");
+                    continue;
+                }
+
+                var registrationDetail = appointment.RegistrationDetail;
+                if (registrationDetail == null)
+                {
+                    _logger.LogError($"Lịch hẹn ID: {visit.VisitId}, Appointment ID: {appointment.AppointmentId} không có RegistrationDetail liên kết!");
+                    continue;
+                }
+
+                var patient = registrationDetail.Patient;
+                if (patient == null)
+                {
+                    _logger.LogError($"Lịch hẹn ID: {visit.VisitId}, Appointment ID: {appointment.AppointmentId}, RegistrationDetail ID: {registrationDetail.RegistrationDetailId} không có Patient liên kết!");
+                    continue;
+                }
+
+                var account = patient.Account;
+                if (account == null)
+                {
+                    _logger.LogError($"Lịch hẹn ID: {visit.VisitId}, Patient ID: {patient.PatientId} không có Account liên kết!");
+                    continue;
+                }
+
+                string patientEmail = account.Email;
+
+                if (!string.IsNullOrEmpty(patientEmail))
+                {
+                    await SendReminderEmailAsync(patientEmail, visit);
+                }
+                else
+                {
+                    _logger.LogWarning($"Không tìm thấy địa chỉ email cho bệnh nhân {patient.PatientName} (ID: {patient.PatientId}, Account ID: {account.AccountId}).  Không gửi nhắc nhở.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi gửi email nhắc nhở cho lịch hẹn {visit.VisitId}: {ex.Message}");
+            }
+        }
+    }
+
+    public async Task SendReminderEmailAsync(string email, Visit visit) // Make sure it's public
+    {
+        var appointment = await _context.Appointments.FindAsync(visit.AppointmentId);
+
+        // **Lấy email từ bảng Account liên kết với Patient**
+        string accountEmail = visit.Appointment.RegistrationDetail.Patient.Account.Email; // Truy cập email qua mối quan hệ
+
+        string subject = "Nhắc nhở lịch tiêm vắc xin";
+        string body = $@"
+            Chào {visit.Appointment.RegistrationDetail.Patient.PatientName},
+
+            Đây là lời nhắc nhở về lịch tiêm vắc xin của bạn:
+
+            Ngày tiêm: {visit.VisitDate?.ToShortDateString() ?? "Chưa xác định"}
+
+            Vui lòng đến đúng giờ để đảm bảo quá trình tiêm chủng diễn ra suôn sẻ.
+
+            Xin cảm ơn!
+        ";
+
+        // LOGGING: Before SendAsync call
+        _logger.LogInformation($"Sending email for Visit ID: {visit.VisitId} to: {email}");
+
+
+        try
+        {
+            await _emailSender.SendAsync(accountEmail, subject, body); // **Gửi email đến accountEmail**
+            _logger.LogInformation($"Email nhắc nhở đã được gửi đến {accountEmail} cho lịch hẹn {visit.VisitId}"); // Log accountEmail
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Lỗi khi gửi email đến {accountEmail}: {ex.Message}"); // Log accountEmail
+            throw; // Re-throw để xử lý ở tầng cao hơn nếu cần
+        }
+    }
 }
