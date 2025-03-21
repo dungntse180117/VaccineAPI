@@ -70,11 +70,11 @@ namespace VaccineAPI.Controllers
             try
             {
                 await _accountService.UpdateAsync(id, model);
-                return NoContent(); // 204 No Content - successful update
+                return NoContent(); 
             }
             catch (ArgumentException ex)
             {
-                return NotFound(ex.Message); // Account not found
+                return NotFound(ex.Message); 
             }
             catch (Exception ex)
             {
@@ -89,11 +89,11 @@ namespace VaccineAPI.Controllers
             try
             {
                 await _accountService.DeleteAsync(id);
-                return NoContent(); // 204 No Content - successful delete
+                return NoContent(); 
             }
             catch (ArgumentException ex)
             {
-                return NotFound(ex.Message); // Account not found
+                return NotFound(ex.Message); 
             }
             catch (Exception ex)
             {
