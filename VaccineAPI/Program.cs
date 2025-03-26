@@ -29,7 +29,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
-builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddSingleton<EmailService>();
 
 
 // Configure DbContext
