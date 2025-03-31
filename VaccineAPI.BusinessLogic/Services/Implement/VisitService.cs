@@ -86,23 +86,19 @@ public class VisitService : IVisitService
         using var transaction = _context.Database.BeginTransaction();
         try
         {
-            // 1. Validation
             var appointment = await _context.Appointments.FindAsync(request.AppointmentID);
             if (appointment == null) throw new Exception("Không tìm thấy Appointment");
-            //Kiểm tra xem Appointment đã hoàn thành chưa
             var appointmentVaccinations = await _context.AppointmentVaccinations.Where(av => av.AppointmentId == request.AppointmentID).ToListAsync();
             bool allVaccinesCompleted = !appointmentVaccinations.Any(av => av.Status != "Đã tiêm xong");
             if (allVaccinesCompleted)
             {
                 throw new Exception("Appointment đã hoàn thành, không thể tạo thêm Visit");
             }
-            //Kiểm tra Appointment Vaccination
             if (request.AppointmentVaccinationIds == null || !request.AppointmentVaccinationIds.Any())
             {
                 throw new ArgumentException("Phải chọn ít nhất một Vaccine cần tiêm");
             }
 
-            // 2. Tạo Visit
             var visit = new Visit
             {
                 AppointmentId = request.AppointmentID,
@@ -113,13 +109,13 @@ public class VisitService : IVisitService
 
             _context.Visits.Add(visit);
             await _context.SaveChangesAsync();
-            //Cập nhật trạng thái Appointment thành Scheduling
+
             if (appointment.Status != "Đang lên lịch")
             {
                 appointment.Status = "Đang lên lịch";
                 await _context.SaveChangesAsync();
             }
-            // 3. Tạo Visit_Vaccination
+   
             foreach (var appointmentVaccinationId in request.AppointmentVaccinationIds)
             {
                 var appointmentVaccination = await _context.AppointmentVaccinations.FindAsync(appointmentVaccinationId);
@@ -127,12 +123,12 @@ public class VisitService : IVisitService
                 {
                     throw new Exception($"Không tìm thấy AppointmentVaccination với ID = {appointmentVaccinationId}");
                 }
-                //Kiểm tra xem còn mũi nào có thể lên lịch không
+           
                 if (appointmentVaccination.DosesScheduled <= 0)
                 {
                     throw new Exception($"Vaccine {appointmentVaccination.VaccinationName} đã lên lịch tiêm hết số mũi tiêm ");
                 }
-                //Giảm DosesScheduled khi lên lịch thành công
+      
                 appointmentVaccination.DosesScheduled--;
                 appointmentVaccination.Status = "Đang lên lịch";
                 var VisitVaccination = new VisitVaccination
@@ -147,7 +143,7 @@ public class VisitService : IVisitService
 
             }
             await _context.SaveChangesAsync();
-            //Kiểm tra xem tất cả các AppointmentVaccination đã được lên lịch hết
+
             appointmentVaccinations = await _context.AppointmentVaccinations.Where(av => av.AppointmentId == request.AppointmentID).ToListAsync();
             bool allDosesScheduled = !appointmentVaccinations.Any(av => av.DosesScheduled > 0);
             if (allDosesScheduled)
@@ -196,7 +192,7 @@ public class VisitService : IVisitService
 
             if (visit == null) throw new Exception("Không tìm thấy Visit");
 
-            // Duyệt qua từng VisitVaccination và cập nhật dosesScheduled
+
             foreach (var visitVaccination in visit.VisitVaccinations)
             {
                 var appointmentVaccination = visitVaccination.AppointmentVaccination;
@@ -209,13 +205,11 @@ public class VisitService : IVisitService
 
             await _context.SaveChangesAsync();
 
-            // Xóa các VisitVaccination liên quan
             if (visit.VisitVaccinations != null && visit.VisitVaccinations.Any())
             {
                 _context.VisitVaccinations.RemoveRange(visit.VisitVaccinations);
             }
 
-            // Cập nhật trạng thái của Appointment nếu cần
             if (visit.Appointment != null && visit.Appointment.Status == "Lên lịch hoàn tất")
             {
                 visit.Appointment.Status = "Đang lên lịch";
@@ -245,6 +239,7 @@ public class VisitService : IVisitService
                       .Include(v => v.Appointment)
                           .ThenInclude(ap => ap.RegistrationDetail)
                               .ThenInclude(rd => rd.Patient)
+                                  .ThenInclude(p => p.Account) 
 
                 .FirstOrDefaultAsync(v => v.VisitId == id);
 
@@ -253,31 +248,31 @@ public class VisitService : IVisitService
                 return new NotFoundResult();
             }
 
-            visit.Status = request.Status; // Cập nhật trạng thái của Visit
+            visit.Status = request.Status; 
 
-            //Nếu status = Da tiêm
+
             if (request.Status == "Đã tiêm")
             {
-                //Duyệt qua tất cả VisitVaccination liên kết với Visit này
+
                 foreach (var visitVaccination in visit.VisitVaccinations)
                 {
                     var appointmentVaccination = visitVaccination.AppointmentVaccination;
                     if (appointmentVaccination != null)
                     {
-                        //Giảm dosesRemaining
+     
                         appointmentVaccination.DosesRemaining--;
-                        //Kiểm tra xem đã tiêm hết số mũi chưa
+      
                         if (appointmentVaccination.DosesRemaining <= 0)
                         {
                             appointmentVaccination.Status = "Đã tiêm hết";
                         }
 
-                        //Tạo bản ghi Vaccination_History
+         
                         var vaccinationHistory = new VaccinationHistory
                         {
                             VisitId = visit.VisitId,
                             VaccinationDate = visit.VisitDate.Value,
-                            Reaction = "", //Để trống , có thể thêm sau
+                            Reaction = "", 
                             VaccineId = appointmentVaccination.VaccinationId,
                             Notes = $"Vào ngày {visit.VisitDate.Value:dd/MM/yyyy} đã tiêm vắc xin {appointmentVaccination.Vaccination.VaccinationName}",
                             PatientId = visit.Appointment.RegistrationDetail.Patient.PatientId
@@ -286,8 +281,7 @@ public class VisitService : IVisitService
                     }
                 }
 
-                //Kiểm tra xem tất cả AppointmentVaccination liên kết với Appointment đã hoàn thành chưa
-                var appointment = await _context.Appointments.FindAsync(visit.AppointmentId); //Đã khai báo bên ngoài if
+                var appointment = await _context.Appointments.FindAsync(visit.AppointmentId); 
                 if (appointment == null)
                 {
                     throw new Exception("Không tìm thấy Appointment");
@@ -297,10 +291,28 @@ public class VisitService : IVisitService
                     .ToListAsync();
 
                 bool allDosesCompleted = !appointmentVaccinations.Any(av => av.DosesRemaining > 0);
-                //Neu da hoan thanh thi doi status appointment thanh Đã hoàn thành lịch tiêm
+       
                 if (allDosesCompleted)
                 {
                     appointment.Status = "Đã hoàn thành lịch tiêm";
+                }
+
+                try
+                {
+                    string feedbackPageUrl = $"{_configuration["Frontend_URL"]}/feedback?visitId={visit.VisitId}&accountId={visit.Appointment.RegistrationDetail.Patient.AccountId}";
+                    string patientEmail = visit.Appointment.RegistrationDetail.Patient.Account.Email;
+                    if (!string.IsNullOrEmpty(patientEmail))
+                    {
+                        await SendFeedbackEmailAsync(patientEmail, visit, feedbackPageUrl);
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Không tìm thấy email cho AccountId: {visit.Appointment.RegistrationDetail.Patient.AccountId} để gửi email đánh giá.");
+                    }
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError($"Lỗi khi gửi email đánh giá cho VisitId: {visit.VisitId}, Error: {emailEx.Message}");
                 }
             }
             await _context.SaveChangesAsync();
@@ -313,6 +325,7 @@ public class VisitService : IVisitService
             return new StatusCodeResult(500);
         }
     }
+   
 
     public async Task<IEnumerable<VisitResponse>> GetVisitsByAppointmentIdAsync(int appointmentId)
     {
@@ -359,23 +372,19 @@ public class VisitService : IVisitService
     }
     public async Task SendVisitReminderEmailsAsync()
     {
-        // LOGGING: Start of SendVisitReminderEmailsAsync
         _logger.LogInformation($"SendVisitReminderEmailsAsync() started at: {DateTime.Now}");
-
-        // Get visits scheduled for today only
         DateTime today = DateTime.Today;
 
         var visits = await _context.Visits
             .Include(v => v.Appointment)
                 .ThenInclude(a => a.RegistrationDetail)
                     .ThenInclude(rd => rd.Patient)
-                        .ThenInclude(p => p.Account) // Include Account here - VERY IMPORTANT for email retrieval!
-            .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Date == today.Date && v.Status != "Đã tiêm") // Chỉ gửi nhắc nhở cho lịch ngày hôm nay
+                        .ThenInclude(p => p.Account) 
+            .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Date == today.Date && v.Status != "Đã tiêm") 
             .ToListAsync();
 
-        // LOGGING: List of Visit IDs to process
         _logger.LogInformation("List of Visit IDs to process:");
-        foreach (var visit in visits) // Log Visit IDs before the loop
+        foreach (var visit in visits) 
         {
             _logger.LogInformation($"  Visit ID: {visit.VisitId}");
         }
@@ -431,13 +440,43 @@ public class VisitService : IVisitService
             }
         }
     }
+    private async Task SendFeedbackEmailAsync(string patientEmail, Visit visit, string feedbackPageUrl)
+    {
+        string subject = "Mời bạn đánh giá dịch vụ tiêm chủng";
+        string body = $@"
+            Chào {visit.Appointment.RegistrationDetail.Patient.PatientName},
 
-    public async Task SendReminderEmailAsync(string email, Visit visit) // Make sure it's public
+            Cảm ơn bạn đã sử dụng dịch vụ tiêm chủng của chúng tôi.
+
+            Chúng tôi rất mong nhận được đánh giá của bạn về trải nghiệm tiêm chủng vừa qua để chúng tôi có thể cải thiện chất lượng dịch vụ.
+
+            Vui lòng nhấp vào đường dẫn sau để đánh giá:
+
+            <a href='{feedbackPageUrl}'>{feedbackPageUrl}</a>
+
+            Xin cảm ơn vì sự hợp tác của bạn!
+        ";
+
+        _logger.LogInformation($"Sending feedback email for Visit ID: {visit.VisitId} to: {patientEmail}, Feedback URL: {feedbackPageUrl}");
+
+        try
+        {
+            await _emailSender.SendAsync(patientEmail, subject, body);
+            _logger.LogInformation($"Feedback email sent successfully to {patientEmail} for Visit ID: {visit.VisitId}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error sending feedback email to {patientEmail} for Visit ID: {visit.VisitId}: {ex.Message}");
+            throw; 
+        }
+    }
+
+    public async Task SendReminderEmailAsync(string email, Visit visit) 
     {
         var appointment = await _context.Appointments.FindAsync(visit.AppointmentId);
 
-        // **Lấy email từ bảng Account liên kết với Patient**
-        string accountEmail = visit.Appointment.RegistrationDetail.Patient.Account.Email; // Truy cập email qua mối quan hệ
+
+        string accountEmail = visit.Appointment.RegistrationDetail.Patient.Account.Email;
 
         string subject = "Nhắc nhở lịch tiêm vắc xin";
         string body = $@"
@@ -463,8 +502,8 @@ public class VisitService : IVisitService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Lỗi khi gửi email đến {accountEmail}: {ex.Message}"); // Log accountEmail
-            throw; // Re-throw để xử lý ở tầng cao hơn nếu cần
+            _logger.LogError($"Lỗi khi gửi email đến {accountEmail}: {ex.Message}"); 
+            throw; 
         }
     }
 }

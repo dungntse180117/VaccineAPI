@@ -101,6 +101,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddHostedService<VisitReminderService>();
 builder.Services.AddScoped<IVisitService, VisitService>();
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

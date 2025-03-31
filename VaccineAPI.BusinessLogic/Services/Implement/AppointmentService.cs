@@ -205,15 +205,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                         .Where(vh => vh.VisitId == visit.VisitId)
                         .ToListAsync();
 
-                    foreach (var vaccinationHistory in vaccinationHistories)
-                    {
-                        var feedbacks = await _context.Feedbacks
-                            .Where(f => f.VaccinationHistoryId == vaccinationHistory.VaccinationHistoryId)
-                            .ToListAsync();
 
-                        _context.Feedbacks.RemoveRange(feedbacks);
-                    }
-                   
                     _context.VaccinationHistories.RemoveRange(vaccinationHistories);
                     
                     var visitDayChangeRequests = await _context.VisitDayChangeRequests
