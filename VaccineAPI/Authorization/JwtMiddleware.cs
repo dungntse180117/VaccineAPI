@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using VaccineAPI.BusinessLogic.Services.Interface;
 using VaccineAPI.Services;
 using VaccineAPI.Shared.Helpers;
-using Microsoft.AspNetCore.Hosting; // **THÊM namespace này**
-using Microsoft.Extensions.Hosting;  // **THÊM namespace này**
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;  
 
 namespace VaccineAPI.Authorization
 {
