@@ -40,8 +40,8 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                     _logger.LogError($"Lỗi khi gửi email nhắc nhở lịch tiêm: {ex.Message}");
                 }
 
-             
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
         }
     }

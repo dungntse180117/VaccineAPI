@@ -444,18 +444,7 @@ public class VisitService : IVisitService
     {
         string subject = "Mời bạn đánh giá dịch vụ tiêm chủng";
         string body = $@"
-            Chào {visit.Appointment.RegistrationDetail.Patient.PatientName},
-
-            Cảm ơn bạn đã sử dụng dịch vụ tiêm chủng của chúng tôi.
-
-            Chúng tôi rất mong nhận được đánh giá của bạn về trải nghiệm tiêm chủng vừa qua để chúng tôi có thể cải thiện chất lượng dịch vụ.
-
-            Vui lòng nhấp vào đường dẫn sau để đánh giá:
-
-            <a href='{feedbackPageUrl}'>{feedbackPageUrl}</a>
-
-            Xin cảm ơn vì sự hợp tác của bạn!
-        ";
+            Chào {visit.Appointment.RegistrationDetail.Patient.PatientName},cảm ơn bạn đã sử dụng dịch vụ tiêm chủng của chúng tôi.Chúng tôi rất mong nhận được đánh giá của bạn về trải nghiệm tiêm chủng vừa qua để chúng tôi có thể cải thiện chất lượng dịch vụ.Vui lòng nhấp vào đường dẫn sau để đánh giá: <a href='{feedbackPageUrl}'>{feedbackPageUrl} </a>  Xin cảm ơn vì sự hợp tác của bạn!";
 
         _logger.LogInformation($"Sending feedback email for Visit ID: {visit.VisitId} to: {patientEmail}, Feedback URL: {feedbackPageUrl}");
 
@@ -482,23 +471,15 @@ public class VisitService : IVisitService
         string body = $@"
             Chào {visit.Appointment.RegistrationDetail.Patient.PatientName},
 
-            Đây là lời nhắc nhở về lịch tiêm vắc xin của bạn:
+            Đây là lời nhắc nhở về lịch tiêm vắc xin của bạn. Ngày tiêm: {visit.VisitDate?.ToShortDateString() ?? "Chưa xác định"}.Vui lòng đến đúng giờ để đảm bảo quá trình tiêm chủng diễn ra suôn sẻ. Xin cảm ơn!";
 
-            Ngày tiêm: {visit.VisitDate?.ToShortDateString() ?? "Chưa xác định"}
-
-            Vui lòng đến đúng giờ để đảm bảo quá trình tiêm chủng diễn ra suôn sẻ.
-
-            Xin cảm ơn!
-        ";
-
-        // LOGGING: Before SendAsync call
         _logger.LogInformation($"Sending email for Visit ID: {visit.VisitId} to: {email}");
 
 
         try
         {
             await _emailSender.SendAsync(accountEmail, subject, body); // **Gửi email đến accountEmail**
-            _logger.LogInformation($"Email nhắc nhở đã được gửi đến {accountEmail} cho lịch hẹn {visit.VisitId}"); // Log accountEmail
+            _logger.LogInformation($"Email nhắc nhở đã được gửi đến {accountEmail} cho lịch hẹn {visit.VisitId}"); 
         }
         catch (Exception ex)
         {
