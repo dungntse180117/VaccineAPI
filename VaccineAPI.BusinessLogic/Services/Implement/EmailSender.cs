@@ -36,7 +36,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             // Create a MimeMessage
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(emailSettings.SenderName, emailSettings.SenderEmail));
-            message.To.Add(new MailboxAddress("", toEmail)); // Empty name is okay
+            message.To.Add(new MailboxAddress("", toEmail)); 
             message.Subject = subject;
 
             // Create a text part with HTML formatting
