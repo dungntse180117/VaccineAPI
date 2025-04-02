@@ -181,6 +181,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
 
         public async Task DeleteAppointmentAsync(int id)
         {
+  
             var appointment = await _context.Appointments.FindAsync(id);
 
             if (appointment == null)
@@ -188,8 +189,54 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 throw new Exception("Không tìm thấy Appointment");
             }
 
-            _context.Appointments.Remove(appointment);
-            await _context.SaveChangesAsync();
+    
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+ 
+                var visits = await _context.Visits
+                    .Where(v => v.AppointmentId == id)
+                    .ToListAsync();
+
+                foreach (var visit in visits)
+                {
+                    var vaccinationHistories = await _context.VaccinationHistories
+                        .Where(vh => vh.VisitId == visit.VisitId)
+                        .ToListAsync();
+
+
+                    _context.VaccinationHistories.RemoveRange(vaccinationHistories);
+                    
+                    var visitDayChangeRequests = await _context.VisitDayChangeRequests
+                        .Where(vdcr => vdcr.VisitId == visit.VisitId)
+                        .ToListAsync();
+
+                    _context.VisitDayChangeRequests.RemoveRange(visitDayChangeRequests);
+
+                    var visitVaccinations = await _context.VisitVaccinations
+                        .Where(vv => vv.VisitId == visit.VisitId)
+                        .ToListAsync();
+
+                    _context.VisitVaccinations.RemoveRange(visitVaccinations);
+                }
+                _context.Visits.RemoveRange(visits);
+
+                var appointmentVaccinations = await _context.AppointmentVaccinations
+                    .Where(av => av.AppointmentId == id)
+                    .ToListAsync();
+
+                _context.AppointmentVaccinations.RemoveRange(appointmentVaccinations);
+
+                _context.Appointments.Remove(appointment);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Lỗi khi xóa Appointment: " + ex.Message, ex);
+            }
         }
         public async Task<IEnumerable<AppointmentVaccination>> GetAppointmentVaccinationsAsync(int appointmentId)
         {

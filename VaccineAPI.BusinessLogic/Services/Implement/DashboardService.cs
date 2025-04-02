@@ -63,5 +63,15 @@ namespace VaccineAPI.BusinessLogic.Services
 
             return result ?? "No data available";
         }
+        public async Task<Dictionary<int, int>> GetWebsiteTrafficVisitsPerMonthAsync(int year)
+        {
+           
+            return await _context.TrafficLogs
+                .Where(log => log.Timestamp.Year == year) 
+                .GroupBy(log => log.Timestamp.Month)       
+                .Select(g => new { Month = g.Key, Count = g.Count() }) 
+                .ToDictionaryAsync(x => x.Month, x => x.Count);
+        }
+
     }
 }

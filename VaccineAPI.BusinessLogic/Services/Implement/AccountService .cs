@@ -81,7 +81,7 @@ namespace VaccineAPI.Services
                 Name = model.Name,
                 Email = model.Email,
                 Password = hashedPassword,
-                RoleId = 2,// Default Role user = 2
+                RoleId = 3,// Default Role user = 3
                 Phone = model.Phone,
                 Address = model.Address,
                 CreatedAt = DateTime.UtcNow,

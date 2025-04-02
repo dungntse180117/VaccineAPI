@@ -398,5 +398,30 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
                 return new StatusCodeResult(500);
             }
         }
+        public async Task<List<RegistrationResponse>> GetAllRegistrationsByAccountIdAsync(int accountId)
+        {
+            try
+            {
+                var registrations = await _context.Registrations
+                    .Where(r => r.AccountId == accountId)
+                    .Select(registration => new RegistrationResponse
+                    {
+                        registrationID = registration.RegistrationId,
+                        AccountId = registration.AccountId,
+                        RegistrationDate = registration.RegistrationDate,
+                        TotalAmount = registration.TotalAmount,
+                        Status = registration.Status,
+                        DesiredDate = registration.DesiredDate
+                    })
+                    .ToListAsync();
+
+                return registrations;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi GetAllRegistrationsByAccountId with AccountId: {accountId}.", accountId);
+                throw;
+            }
+        }
     }
 }

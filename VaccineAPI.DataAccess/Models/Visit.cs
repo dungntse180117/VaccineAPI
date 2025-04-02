@@ -17,6 +17,8 @@ public partial class Visit
 
     public virtual Appointment Appointment { get; set; } = null!;
 
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+
     public virtual ICollection<VaccinationHistory> VaccinationHistories { get; set; } = new List<VaccinationHistory>();
 
     public virtual ICollection<VisitDayChangeRequest> VisitDayChangeRequests { get; set; } = new List<VisitDayChangeRequest>();

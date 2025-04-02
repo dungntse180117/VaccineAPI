@@ -1,17 +1,21 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using VaccineAPI.Shared.Request;
-//using VaccineAPI.Shared.Response;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using VaccineAPI.Shared.Request;
+using VaccineAPI.Shared.Response;
 
-//namespace VaccineAPI.BusinessLogic.Interface
-//{
-//    public interface IFeedbackService
-//    {
-//        Task<ManageFeedbackResponse> ManageFeedbackAsync(string action, ManageFeedbackRequest request);
-//        Task<GetFeedbackResponse> GetFeedbackAsync(int feedbackId);
-//        Task<IEnumerable<GetFeedbackResponse>> GetAllFeedbacksAsync();
-//    }
-//}
+namespace VaccineAPI.BusinessLogic.Interface
+{
+    public interface IFeedbackService
+    {
+        Task<ActionResult<FeedbackResponse>> CreateFeedbackAsync(CreateFeedbackRequest request); 
+        Task<ActionResult<FeedbackResponse>> GetFeedbackByIdAsync(int feedbackId);
+        Task<ActionResult<List<FeedbackResponse>>> ListFeedbacksAsync(); 
+        Task<ActionResult<FeedbackResponse>> UpdateFeedbackAsync(UpdateFeedbackRequest request);
+        Task<ActionResult<IActionResult>> DeleteFeedbackAsync(int feedbackId);
+        Task<bool> CheckFeedbackExistsAsync(int visitId);
+    }
+}

@@ -109,5 +109,25 @@ namespace VaccineAPI.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+        [HttpGet("account/{accountId}")]
+        public async Task<ActionResult<List<RegistrationResponse>>> GetAllRegistrationsByAccountIdAsync(int accountId)
+        {
+            try
+            {
+                var registrations = await _registrationService.GetAllRegistrationsByAccountIdAsync(accountId);
+
+                if (registrations == null || registrations.Count == 0)
+                {
+                    return NotFound($"Không tìm thấy đăng ký nào cho AccountId: {accountId}"); 
+                }
+
+                return Ok(registrations);             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy tất cả Registrations theo AccountId: {accountId}.", accountId);
+                return StatusCode(500, "Đã xảy ra lỗi máy chủ khi lấy danh sách đăng ký."); 
+            }
+        }
+
     }
 }

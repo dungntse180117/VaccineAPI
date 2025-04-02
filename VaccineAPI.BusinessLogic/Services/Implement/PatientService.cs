@@ -240,12 +240,12 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             }
         }
 
-        public async Task<List<PatientResponse>> GetPatientsByPhoneAsync(string phone)
+        public async Task<List<PatientResponse>> GetPatientsByPhoneAsync(string phone, int accountId) 
         {
             try
             {
                 var patients = await _context.Patients
-                .Where(p => p.Phone == phone)
+                .Where(p => p.Phone == phone && p.AccountId == accountId) 
                 .Select(patient => new PatientResponse
                 {
                     PatientId = patient.PatientId,
@@ -264,7 +264,7 @@ namespace VaccineAPI.BusinessLogic.Services.Implement
             catch (Exception e)
             {
 
-                _logger.LogError(e, "GetPatientsByPhoneAsync error with phone: {phone}", phone);
+                _logger.LogError(e, "GetPatientsByPhoneAsync error with phone: {phone} and accountId: {accountId}", phone, accountId);
                 throw;
             }
         }
