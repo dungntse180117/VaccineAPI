@@ -43,13 +43,5 @@ namespace VaccineAPI.Controllers
             var result = await _dashboardService.GetMostPurchasedPackageAsync();
             return Ok(result);
         }
-
-        [HttpGet("WebsiteTrafficVisitsPerMonth")] 
-        public async Task<IActionResult> GetWebsiteTrafficVisitsPerMonth(int year)
-        {
-            var result = await _dashboardService.GetWebsiteTrafficVisitsPerMonthAsync(year);
-            return Ok(result);
-        }
-
     }
 }

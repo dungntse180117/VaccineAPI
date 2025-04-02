@@ -9,7 +9,6 @@ using VaccineAPI.Shared.Request;
 using Microsoft.EntityFrameworkCore;
 using VaccineAPI.DataAccess.Data;
 using VaccineAPI.BusinessLogic.Services.Interface;
-using MailKit.Search;
 
 namespace VaccineAPI.Controllers
 {
@@ -102,28 +101,14 @@ namespace VaccineAPI.Controllers
                     var result = await _registrationService.UpdateRegistrationStatusAsync(orderId, updateRequest);
                     registration.TotalAmount = (decimal)(double.Parse(vnpAmount) / 100); 
                     await _context.SaveChangesAsync();
+
+                  
                     return Redirect("http://localhost:5173/payment-success");
                 }
                 else 
                 {
-                    var orderParts = vnpTxnRef.ToString().Split('_');
-                    if (!int.TryParse(orderParts[0], out int orderId))
-                    {
-                        return BadRequest("Invalid OrderId format.");
-                    }
-                    var registration = await _context.Registrations.FindAsync(orderId);
-                    if (registration == null)
-                    {
-                        return BadRequest("Registration not found.");
-                    }
-                    var updateRequest = new UpdateRegistrationStatusRequest
-                    {
-                        Status = "Cancelled"
-                    };
-                    var result = await _registrationService.UpdateRegistrationStatusAsync(orderId, updateRequest);
-                    await _context.SaveChangesAsync();
+                  
                     return Redirect("http://localhost:5173/payment-failed");
-                    
                 }
             }
             catch (Exception ex)

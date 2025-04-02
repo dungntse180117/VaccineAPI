@@ -17,7 +17,6 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
             Task<Dictionary<int, int>> GetVisitsPerMonthAsync(int month);
             Task<string> GetMostPurchasedVaccineAsync();
             Task<string> GetMostPurchasedPackageAsync();
-            Task<Dictionary<int, int>> GetWebsiteTrafficVisitsPerMonthAsync(int year);
         }
     }
 

@@ -29,6 +29,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
+builder.Services.Configure<ZalopayConfig>(builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+
 
 // Configure DbContext
 builder.Services.AddDbContext<VaccinationTrackingContext>(options =>
@@ -98,10 +100,6 @@ builder.Services.AddScoped<IVisitDayChangeRequestService, VisitDayChangeRequestS
 builder.Services.AddScoped<IVaccinationHistoryService, VaccinationHistoryService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddHostedService<VisitReminderService>();
-builder.Services.AddScoped<IVisitService, VisitService>();
-builder.Services.AddSingleton<IEmailSender, EmailSender>();
-builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

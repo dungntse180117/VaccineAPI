@@ -17,7 +17,6 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
         Task<IActionResult> DeleteRegistrationAsync(int id);
         Task<IActionResult> UpdateRegistrationStatusAsync(int id, UpdateRegistrationStatusRequest request);
         Task CreateRegistrationDetailsAsync(int registrationId);
-        Task<List<RegistrationResponse>> GetAllRegistrationsByAccountIdAsync(int accountId);
     }
 }
 

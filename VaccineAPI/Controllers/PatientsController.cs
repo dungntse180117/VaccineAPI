@@ -31,8 +31,9 @@ namespace VaccineAPI.Controllers
                 return CreatedAtAction(nameof(GetPatient), new { id = response.PatientId }, response);
             }
             catch (Exception ex)
-            {     
-                return BadRequest(ex.Message);
+            {
+                // Log lỗi ở đây (sử dụng _logger)
+                return BadRequest(ex.Message); // Hoặc trả về mã lỗi 500 InternalServerError
             }
         }
 
@@ -93,20 +94,24 @@ namespace VaccineAPI.Controllers
                 return NotFound();
             }
 
-            return NoContent(); 
+            return NoContent(); // Trả về 204 No Content nếu xóa thành công
         }
-
-        [HttpGet("byphone/{phone}/{accountId}")]
-        public async Task<IActionResult> GetPatientsByPhone(string phone,int accountId )
+        [HttpGet("byphone/{phone}")]
+        public async Task<IActionResult> GetPatientsByPhone(string phone)
         {
             try
             {
-                var patients = await _patientService.GetPatientsByPhoneAsync(phone, accountId);
+                var patients = await _patientService.GetPatientsByPhoneAsync(phone);
+                if (patients == null || patients.Count == 0)
+                {
+                    return NotFound("No patients found with the provided phone number.");
+                }
                 return Ok(patients);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Lỗi server: " + ex.Message);
+             
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
             }
         }
     }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VaccineAPI.DataAccess.Models;
 using VaccineAPI.Shared.Request;
 using VaccineAPI.Shared.Response;
 
@@ -20,7 +19,6 @@ namespace VaccineAPI.BusinessLogic.Services.Interface
         Task<IActionResult> UpdateVisitStatusAsync(int id, UpdateVisitStatusRequest request);
         Task<IEnumerable<VisitResponse>> GetVisitsByAppointmentIdAsync(int appointmentId);
         Task<IEnumerable<VisitResponse>> GetVisitsByPatientIdAsync(int patientId);
-        Task SendReminderEmailAsync(string email, Visit visit);
-        Task SendVisitReminderEmailsAsync();
+
     }
 }

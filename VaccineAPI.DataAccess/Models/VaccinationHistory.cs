@@ -19,6 +19,8 @@ public partial class VaccinationHistory
 
     public int? PatientId { get; set; }
 
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+
     public virtual Patient? Patient { get; set; }
 
     public virtual Vaccination Vaccine { get; set; } = null!;
